@@ -1,11 +1,12 @@
 public abstract class GeneratorStrategy{
-    protected static int max=0;
+    final public static int INITIAL_MAX=2;
+    protected int max=INITIAL_MAX;
     public void reset(){
-        max=0;
+        max=INITIAL_MAX;
     }
     public void updateMax(int newMax){
-        if(newMax>GeneratorStrategy.max){
-            GeneratorStrategy.max=newMax;
+        if(newMax>max){
+            max=newMax;
         }
     }
     //to be overriden

@@ -1,5 +1,3 @@
-import GeneratorStrategy;
-import PlainGenerator;
 public class ValueGenerator{
     private Grid theGrid;
     private GeneratorStrategy generator;
