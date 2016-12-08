@@ -1,3 +1,4 @@
+package MainLogic;
 public class Cell{
     private int value=0;
     private String name;

@@ -1,3 +1,5 @@
+package GenerateNumbers;
+import MainLogic.Grid;
 public class ValueGenerator{
     private Grid theGrid;
     private GeneratorStrategy generator;

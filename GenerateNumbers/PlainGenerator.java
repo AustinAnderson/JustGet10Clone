@@ -1,3 +1,4 @@
+package GenerateNumbers;
 public class PlainGenerator extends GeneratorStrategy{
     @Override
     public int next(){

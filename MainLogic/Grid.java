@@ -1,5 +1,7 @@
+package MainLogic;
 import java.util.List;
 import java.util.ArrayList;
+import GenerateNumbers.ValueGenerator;
 public class Grid{
     private List<CellHolder> cells;
     private int squareSize;

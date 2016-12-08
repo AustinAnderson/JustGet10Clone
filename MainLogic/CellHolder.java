@@ -1,5 +1,7 @@
+package MainLogic;
 import java.util.List;
 import java.util.ArrayList;
+import GenerateNumbers.ValueGenerator;
 public class CellHolder{
     private List<CellHolder> adjList=new ArrayList<>();
     private int next=0;

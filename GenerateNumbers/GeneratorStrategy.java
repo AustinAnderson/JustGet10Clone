@@ -1,3 +1,4 @@
+package GenerateNumbers;
 public abstract class GeneratorStrategy{
     final public static int INITIAL_MAX=2;
     protected int max=INITIAL_MAX;
