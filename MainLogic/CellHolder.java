@@ -12,7 +12,13 @@ public class CellHolder{
 
     public CellHolder(String id,ValueGenerator valueGenerator){
         name=id;
+        this.valueGenerator=valueGenerator;
         cell=new Cell(name+replaceCount,valueGenerator.next());
+    }
+
+    public void clear(){
+        next=0;
+        cell=null;
     }
 
     public void shiftCellToMe(CellHolder other){
@@ -30,17 +36,42 @@ public class CellHolder{
         }
         return toReturn;
     }
+    public boolean canCombine(){//need to test this
+        boolean equalNeighbor=false;
+        
+        CellHolder next=nextCellHolder();
+        while(next!=null){
+            if(next.getValue()==getValue()){
+                equalNeighbor=true;
+            }
+            next=nextCellHolder();
+        }
+        resetIterator();
+        return equalNeighbor;
+    }
+
 
     @Override
     public String toString(){
-        return cell.toString();
+        return name;
+    }
+    public String print(){
+        String toReturn=" ";
+        if(cell!=null){
+            toReturn=cell.toString();
+        }
+        return toReturn;
     }
 
     public String toDebugString(){
         StringBuilder builder=new StringBuilder();
         builder.append("[");
         builder.append(getName());
-        builder.append("("+cell.toDebugString()+")");
+        if(cell!=null){
+            builder.append("("+cell.toDebugString()+")");
+        }else{
+            builder.append("(null)");
+        }
         builder.append(", {");
         CellHolder next=nextCellHolder();
         if(next!=null){
@@ -58,7 +89,11 @@ public class CellHolder{
     }
 
     public int getValue(){
-        return cell.getValue();
+        int toReturn=0;
+        if(cell!=null){
+            toReturn=cell.getValue();
+        }
+        return toReturn;
     }
 
     public void increment(){

@@ -1,6 +1,9 @@
 package MainLogic;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Stack;
 import GenerateNumbers.ValueGenerator;
 public class Grid{
     private List<CellHolder> cells;
@@ -15,18 +18,93 @@ public class Grid{
         for(int i=0;i<squareSize*squareSize;i++){
             setAdjList(cells.get(i),i);
         }
-
     }
     //driver
     public static void main(String[] args){
         Grid g=new Grid(Integer.parseInt(args[0]));
         g.print();
-        System.out.println(g.toDebugString());
+        g.combineOn(2,2);
+    }
+
+    public void combineOn(int i,int j){
+        CellHolder current=cells.get(flattenNdx(i,j));
+        CellHolder next=current.nextCellHolder();
+        boolean equalNeighbor=false;
+        while(next!=null){
+            if(current.getValue()==next.getValue()){
+                equalNeighbor=true;
+            }
+            next=current.nextCellHolder();
+        }
+        if(equalNeighbor){
+            bfsClear(i,j);
+            current.increment();
+        }
+        collapse();
+    }
+    public boolean hasLost(){//need to test this
+        boolean lost=true;
+        for(CellHolder currentHolder: cells){
+            if(currentHolder.canCombine()){
+                lost=false;
+            }
+        }
+        return lost;
+    }
+    public void update(){
+        System.out.print("\u001b[2J\u001b[H");
+        System.out.flush();
+        print();
+    }
+    private void sleep(int time){
+        try{
+            Thread.sleep(time);
+        }catch(InterruptedException e){};
+    }
+
+    public void bfsClear(int i, int j){
+        Queue<CellHolder> bfsQ=new LinkedList<>();
+        CellHolder dontChange=cells.get(flattenNdx(i,j));
+        bfsQ.add(dontChange);
+        CellHolder topNeighbor=null;
+        resetAll();
+
+        while(bfsQ.peek()!=null){
+            if(topNeighbor!=null&&bfsQ.peek().getValue()==topNeighbor.getValue()){
+                if(!topNeighbor.equals(dontChange)&&topNeighbor.getValue()!=0){
+                    bfsQ.add(topNeighbor);
+                }
+            }
+            topNeighbor=bfsQ.peek().nextCellHolder();
+            if(topNeighbor==null){
+                CellHolder removed=bfsQ.remove();
+                if(!removed.equals(dontChange)){
+                    removed.clear();
+                    update();
+                    sleep(100);
+                }
+            }
+        }
     }
 
     public void collapse(){
         valueGenerator.update();
-        //...
+        for(int k=0;k<squareSize;k++){
+            for(int j=0;j<squareSize;j++){
+                cells.get(flattenNdx(0,j)).fillNullCell();
+            }
+            for(int i=squareSize-1;i>0;i--){
+                for(int j=0;j<squareSize;j++){
+                    if(cells.get(flattenNdx(i,j)).getValue()==0){
+                        cells.get(flattenNdx(i,j)).shiftCellToMe(
+                            cells.get(flattenNdx(i-1,j))
+                        );
+                    }
+                }
+            }
+            update();
+            sleep(200);
+        }
     }
     public int getMaxValue(){
         int maxValue=0;
@@ -45,7 +123,7 @@ public class Grid{
     public void print(){
         for(int i=0;i<squareSize;i++){
             for(int j=0;j<squareSize;j++){
-                System.out.print(cells.get(flattenNdx(i,j))+" ");
+                System.out.print(cells.get(flattenNdx(i,j)).print()+" ");
             }
             System.out.println();
         }
@@ -76,6 +154,11 @@ public class Grid{
         }
         if((index+squareSize)<(squareSize*squareSize)){
             toSet.addAdjacentCellHolder(cells.get(index+squareSize));
+        }
+    }
+    private void resetAll(){
+        for(CellHolder currentHolder:cells){
+            currentHolder.resetIterator();
         }
     }
     //for a
