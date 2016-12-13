@@ -125,7 +125,11 @@ public class Grid{
             for(int j=0;j<squareSize;j++){
                 System.out.print(cells.get(flattenNdx(i,j)).print()+" ");
             }
-            System.out.println();
+            System.out.println(" "+i);
+        }
+        System.out.println();
+        for(int i=0;i<squareSize;i++){
+            System.out.print(i+" ");
         }
         System.out.println();
     }
