@@ -1,4 +1,5 @@
 package MainLogic;
+import Util.TerminalColorMap;
 public class Cell{
     private int value=0;
     private String name;
@@ -14,7 +15,7 @@ public class Cell{
     }
     @Override
     public String toString(){
-        return ""+value;
+        return TerminalColorMap.get(value)+value;
     }
     public String toDebugString(){
         return "|"+name+"="+value+"|";

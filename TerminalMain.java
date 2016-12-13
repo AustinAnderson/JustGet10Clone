@@ -3,6 +3,7 @@ import MainLogic.Grid;
 public class TerminalMain{
     public static void main(String[] args){
         Grid g=new Grid(8);
+        g.setDebug();
         Scanner scanner=new Scanner(System.in);
         String line=null;
         System.out.print("\u001b[2J\u001b[H");

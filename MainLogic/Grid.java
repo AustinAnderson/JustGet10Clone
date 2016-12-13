@@ -5,8 +5,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Stack;
 import GenerateNumbers.ValueGenerator;
+import Util.TerminalColorMap;
 public class Grid{
     private List<CellHolder> cells;
+    private boolean terminalDebug=false;
     private int squareSize;
     private ValueGenerator valueGenerator=new ValueGenerator(this);
     public Grid(int size){
@@ -19,9 +21,13 @@ public class Grid{
             setAdjList(cells.get(i),i);
         }
     }
+    public void setDebug(){
+        terminalDebug=true;
+    }
     //driver
     public static void main(String[] args){
         Grid g=new Grid(Integer.parseInt(args[0]));
+        g.setDebug();
         g.print();
         g.combineOn(2,2);
     }
@@ -52,14 +58,18 @@ public class Grid{
         return lost;
     }
     public void update(){
-        System.out.print("\u001b[2J\u001b[H");
-        System.out.flush();
-        print();
+        if(terminalDebug){
+            System.out.print("\u001b[2J\u001b[H");
+            System.out.flush();
+            print();
+        }
     }
     private void sleep(int time){
-        try{
-            Thread.sleep(time);
-        }catch(InterruptedException e){};
+        if(terminalDebug){
+            try{
+                Thread.sleep(time);
+            }catch(InterruptedException e){};
+        }
     }
 
     public void bfsClear(int i, int j){
@@ -123,9 +133,10 @@ public class Grid{
     public void print(){
         for(int i=0;i<squareSize;i++){
             for(int j=0;j<squareSize;j++){
+                System.out.print(TerminalColorMap.clear());
                 System.out.print(cells.get(flattenNdx(i,j)).print()+" ");
             }
-            System.out.println(" "+i);
+            System.out.println(TerminalColorMap.clear()+" "+i);
         }
         System.out.println();
         for(int i=0;i<squareSize;i++){
