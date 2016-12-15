@@ -3,7 +3,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Stack;
+import java.util.Deque;
+import java.util.ArrayDeque;
 import GenerateNumbers.ValueGenerator;
 import Util.TerminalColorMap;
 public class Grid{
@@ -15,7 +16,7 @@ public class Grid{
         cells=new ArrayList<>();
         squareSize=size;
         for(int i=0;i<squareSize*squareSize;i++){
-            cells.add(new CellHolder(String.format("%02d",i),valueGenerator));
+            cells.add(new CellHolder(expandNdx(i),valueGenerator));
         }
         for(int i=0;i<squareSize*squareSize;i++){
             setAdjList(cells.get(i),i);
@@ -59,7 +60,8 @@ public class Grid{
     }
     public void update(){
         if(terminalDebug){
-            System.out.print("\u001b[2J\u001b[H");
+            //System.out.print("\u001b[2J\u001b[H");
+            System.out.print("\u001b[H");
             System.out.flush();
             print();
         }
@@ -74,13 +76,14 @@ public class Grid{
 
     public void bfsClear(int i, int j){
         Queue<CellHolder> bfsQ=new LinkedList<>();
+        Deque<CellHolder> animate=new ArrayDeque<>();
         CellHolder dontChange=cells.get(flattenNdx(i,j));
         bfsQ.add(dontChange);
         CellHolder topNeighbor=null;
         resetAll();
 
         while(bfsQ.peek()!=null){
-            if(topNeighbor!=null&&bfsQ.peek().getValue()==topNeighbor.getValue()){
+            if(topNeighbor!=null&&!topNeighbor.beenVisited()&&bfsQ.peek().getValue()==topNeighbor.getValue()){
                 if(!topNeighbor.equals(dontChange)&&topNeighbor.getValue()!=0){
                     bfsQ.add(topNeighbor);
                 }
@@ -88,13 +91,19 @@ public class Grid{
             topNeighbor=bfsQ.peek().nextCellHolder();
             if(topNeighbor==null){
                 CellHolder removed=bfsQ.remove();
+                removed.setVisited();
                 if(!removed.equals(dontChange)){
-                    removed.clear();
-                    update();
-                    sleep(100);
+                    animate.addLast(removed);
                 }
             }
         }
+        while(animate.size()>0){
+            animate.removeLast().clear();
+            update();
+            sleep(50);
+        }
+        System.out.print("\u001b[2J\u001b[H");
+        print();
     }
 
     public void collapse(){
@@ -140,7 +149,16 @@ public class Grid{
         }
         System.out.println();
         for(int i=0;i<squareSize;i++){
-            System.out.print(i+" ");
+            if(i/10!=0){
+                System.out.print(i/10);
+            }else{
+                System.out.print(" ");
+            }
+            System.out.print(" ");
+        }
+        System.out.println();
+        for(int i=0;i<squareSize;i++){
+            System.out.print(i%10+" ");
         }
         System.out.println();
     }
@@ -184,6 +202,9 @@ public class Grid{
     //a[2][3]=>a[11]
     private int flattenNdx(int i,int j){
         return i*squareSize+j;
+    }
+    private String expandNdx(int flattened){
+        return "{"+(flattened/squareSize)+","+(flattened%squareSize)+"}";
     }
 
 }

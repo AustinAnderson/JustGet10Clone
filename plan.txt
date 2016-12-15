@@ -1,0 +1,3 @@
+have server send client a json array version of the stack of bfs tiles, and an array of arrays that is the generated tiles for each column that falls and has new tiles.
+
+have client send server array of arrays that is current game state

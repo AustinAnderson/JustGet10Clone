@@ -2,7 +2,7 @@ import java.util.Scanner;
 import MainLogic.Grid;
 public class TerminalMain{
     public static void main(String[] args){
-        Grid g=new Grid(8);
+        Grid g=new Grid(Integer.parseInt(args[0]));
         g.setDebug();
         Scanner scanner=new Scanner(System.in);
         String line=null;
