@@ -66,7 +66,7 @@ public class Grid{
             print();
         }
     }
-    private void sleep(int time){
+    public void sleep(int time){
         if(terminalDebug){
             try{
                 Thread.sleep(time);
@@ -75,35 +75,39 @@ public class Grid{
     }
 
     public void bfsClear(int i, int j){
-        Queue<CellHolder> bfsQ=new LinkedList<>();
-        Deque<CellHolder> animate=new ArrayDeque<>();
+        Queue<Transition> bfsQ=new LinkedList<>();
+        Deque<Transition> animate=new ArrayDeque<>();
+        TransitionList tList=new TransitionList();
         CellHolder dontChange=cells.get(flattenNdx(i,j));
-        bfsQ.add(dontChange);
+        bfsQ.add(new Transition(dontChange,dontChange));
         CellHolder topNeighbor=null;
         resetAll();
-
-        while(bfsQ.peek()!=null){
-            if(topNeighbor!=null&&!topNeighbor.beenVisited()&&bfsQ.peek().getValue()==topNeighbor.getValue()){
+        while(bfsQ.peek()!=null&&bfsQ.peek().from!=null){
+            if(topNeighbor!=null&&!topNeighbor.beenVisited()&&
+                    bfsQ.peek().from.getValue()==topNeighbor.getValue()&&
+                    !bfsQ.peek().from.beenVisited()){
                 if(!topNeighbor.equals(dontChange)&&topNeighbor.getValue()!=0){
-                    bfsQ.add(topNeighbor);
+                    bfsQ.add(new Transition(topNeighbor,bfsQ.peek().from));
                 }
             }
-            topNeighbor=bfsQ.peek().nextCellHolder();
+            topNeighbor=bfsQ.peek().from.nextCellHolder();
             if(topNeighbor==null){
-                CellHolder removed=bfsQ.remove();
-                removed.setVisited();
-                if(!removed.equals(dontChange)){
+                Transition removed=bfsQ.remove();
+                removed.from.setVisited();
+                if(!removed.from.equals(dontChange)){
                     animate.addLast(removed);
                 }
             }
         }
+
         while(animate.size()>0){
-            animate.removeLast().clear();
-            update();
-            sleep(50);
+            Transition out=animate.removeLast();
+            tList.addTransition(out);
         }
+        tList.animate(this);
         System.out.print("\u001b[2J\u001b[H");
         print();
+        System.out.println(tList.print());
     }
 
     public void collapse(){
@@ -204,7 +208,7 @@ public class Grid{
         return i*squareSize+j;
     }
     private String expandNdx(int flattened){
-        return "{"+(flattened/squareSize)+","+(flattened%squareSize)+"}";
+        return "{ x:"+(flattened/squareSize)+", y:"+(flattened%squareSize)+"}";
     }
 
 }
