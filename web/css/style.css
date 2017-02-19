@@ -1,0 +1,22 @@
+.border{
+    fill: black;
+}
+.tile{
+    transition: transform .2s, opacity .1s; 
+}
+.n1{
+    stroke: darkgreen;
+    fill: lightgreen;
+}
+.n2{
+    stroke: blue;
+    fill: lightblue;
+}
+.n3{
+    stroke: red;
+    fill: orange;
+}
+.n4{
+    stroke: orange;
+    fill: red;
+}
