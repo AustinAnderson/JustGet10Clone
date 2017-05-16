@@ -1,8 +1,17 @@
+.display{
+    display: block;
+    margin: auto;
+    height: 400;
+    width: 400;
+}
 .border{
     fill: black;
 }
 .tile{
-    transition: transform .2s, opacity .1s; 
+    transition: transform .3s, opacity .2s; /**/
+}
+.hiddenTile{
+    display:none;
 }
 .n1{
     stroke: darkgreen;

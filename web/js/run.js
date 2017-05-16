@@ -1,46 +1,18 @@
 
-var sampleTransitionList=[
-//server bfs should return this after tile is clicked
-	[
-		{'fromId':'t20','toId': 't21'}
-	],
-	[
-		{'fromId':'t30','toId': 't40'},
-		{'fromId':'t21','toId': 't22'}
-	],
-	[
-		{'fromId':'t40','toId': 't41'},
-		{'fromId':'t22','toId': 't23'},
-		{'fromId':'t13','toId': 't23'}
-	],
-	[
-		{'fromId':'t41','toId': 't42'},
-		{'fromId':'t14','toId': 't24'},
-		{'fromId':'t23','toId': 't33'}
-	],
-	[
-		{'fromId':'t42','toId': 't43'},
-		{'fromId':'t24','toId': 't34'},
-		{'fromId':'t33','toId': 't34'}
-	],
-	[
-		{'fromId':'t43','toId': 't44'},
-		{'fromId':'t34','toId': 't44'}
-	]
-];
 
 function TransitionRunner(transitionsList){
-	this.transitionsList=transitionsList;
-	this.currentTransition=0;
-}
-TransitionRunner.prototype={
-	constructor:TransitionRunner,
+    var storeOldValuesMap=new Map();
 
-	resetWith: function(newList){
+	this.resetWith=function(newList){
 		this.transitionsList=newList;
 		this.currentTransition=0;
+        this.transitionsList.forEach(function(arrayOfTuples){
+            arrayOfTuples.forEach(function(tuple){
+                storeOldValuesMap.set(tuple.fromId,document.getElementById(tuple.fromId).style.transform);
+            });
+        });
 	},
-	runNext:function(){
+	this.runNext=function(){
 		if(this.currentTransition<this.transitionsList.length){
 			var concurrentTransitionList=this.transitionsList[this.currentTransition];
 			moveTile(concurrentTransitionList[0].fromId,concurrentTransitionList[0].toId,this,true);
@@ -48,8 +20,21 @@ TransitionRunner.prototype={
 				moveTile(concurrentTransitionList[i].fromId,concurrentTransitionList[i].toId,this,false);
 			}
 			this.currentTransition++;
-		}
+		}else{
+            console.log("done");
+            for(var [key,value] of storeOldValuesMap){
+                var tile=document.getElementById(key);
+                var tileSytle=tile.style;
+                //var originalClassList=[];
+                //tile.classList.forEach(function(item){
+                    //originalClassList.push(item);
+                //}
+                tile.classList=[];
+                tileSytle.transform=value;
+            }
+        }
 	}
+    this.resetWith(transitionsList);
 }
 var moveTile=function(fromId,toId,TransitionRunner,shouldIncrement){
     var i=document.getElementById(fromId).style;
@@ -59,6 +44,7 @@ var moveTile=function(fromId,toId,TransitionRunner,shouldIncrement){
 		function(e){
 			if(e.propertyName=="opacity"&&shouldIncrement){
 				TransitionRunner.runNext();
+
 			}
 		}
 	);
@@ -110,16 +96,12 @@ var createTile=function(row,col,number){
 	text.setAttribute("dy","25px");
 	text.setAttribute("dx","15px");
 	text.innerHTML=""+number;
-	//text.innerHTML="t"+col+row;
 	inner.appendChild(box);
 	inner.appendChild(text);
 	tile.appendChild(border);
 	tile.appendChild(inner);
 	tile.addEventListener("click",function(){console.log(this.id+" clicked");});
 	
-	////why web dev is sketchy: exibit A
-	//tile.addEventListener("click",(new TransitionRunner(sampleTransitionList)).runNext()); //doesnt work due to loading times
-	//tile.setAttribute("onclick","(new TransitionRunner(sampleTransitionList)).runNext()");
 	return tile;
 }	
 
@@ -127,7 +109,7 @@ var createTile=function(row,col,number){
 var fillBoard=function(tileMat){
 	for(var i=0;i<tileMat.length;i++){
 		for(var j=0;j<tileMat[i].length;j++){
-			document.getElementById("test").appendChild(createTile(j,i,tileMat[i][j]));
+			document.getElementById("display").appendChild(createTile(j,i,tileMat[i][j]));
 		}
 	}
 }
