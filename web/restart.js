@@ -15,15 +15,11 @@ function Globals(){
 
 
 
-function Tile(number,row,col,svg){
-    var target=svg;
+function Tile(number,parentDom){
     var styleHandle=undefined;
-    var num=null;
     var numberStyleHandle=null;
     var numberTextHandle=null;
     var tileHandle=null;
-    var r=row;
-    var c=col;
 
 
     this.setOpacity=function(value){
@@ -41,26 +37,19 @@ function Tile(number,row,col,svg){
         tileHandle.removeEventListener("transitionend",movementChainFunction);
     }
 
-
-    this.getNumber=function(){
-        return num;
-    }
-    this.setNumber=function(fnumber){
+    var setNumber=function(fnumber){
         numberTextHandle.innerHTML=fnumber;
         numberStyleHandle.classList=["n"+fnumber];
-        num=fnumber;
     }
 
-    this.updatePosition=function(tileHolder){//need to test
-        r=tileHolder.getPosition().r;
-        c=tileHolder.getPosition().c;
+    this.remove=function(){
+        tileHandle.remove();
     }
 
     var render=function(){
 
 
         var tile=document.createElementNS('http://www.w3.org/2000/svg',"g");
-        tile.style="transform: translate("+((globals.borderWidth*2+globals.cellSize)*row)+"px,"+((globals.borderWidth*2+globals.cellSize)*col)+"px)";
         tile.classList=["tile"];
         this.classList=tile.classList;
         styleHandle=tile.style;
@@ -96,7 +85,7 @@ function Tile(number,row,col,svg){
             }
         }
         var inner=document.createElementNS('http://www.w3.org/2000/svg',"g");
-        inner.setAttribute("class","n"+num);
+        inner.setAttribute("class","n"+number);
         numberStyleHandle=inner;
         inner.style="transform: translate(5px,5px)";
         var box=document.createElementNS('http://www.w3.org/2000/svg',"rect");
@@ -109,40 +98,88 @@ function Tile(number,row,col,svg){
         inner.appendChild(text);
         tile.appendChild(border);
         tile.appendChild(inner);
-        tile.addEventListener("click",function(){console.log(""+r+c+" clicked");});
         tileHandle=tile;
-        svg.appendChild(tile);
+        parentDom.appendChild(tile);
     }	
 
     render();
-    this.setNumber(number);
+    setNumber(number);
 
     
 }
 function TileHolder(row,col,number,svg,tileGrid){
-    var transform=globals.indexes2Transform(row,col);
-    var tile=new Tile(number,row,col,svg);
+    var tileHolderDom=document.createElementNS('http://www.w3.org/2000/svg',"g");
+    var translateX=((globals.borderWidth*2+globals.cellSize)*row);
+    var translateY=((globals.borderWidth*2+globals.cellSize)*col);
+    tileHolderDom.style.transform="translate("+translateX+"px,"+translateY+"px)";
+    tileHolderDom.addEventListener("click",function(){console.log(""+row+col+"clicked");},true);
+    tileHolderDom.setAttribute("class","bob");
+    var shapeHolder=document.createElementNS('http://www.w3.org/2000/svg',"rect");
+    shapeHolder.style.height=""+(globals.borderWidth*2+globals.cellSize)+"px";
+    shapeHolder.style.width=""+(globals.borderWidth*2+globals.cellSize)+"px";
+    shapeHolder.style.transform="translate("+globals.borderWidth+"px,"+globals.borderWidth+"px)";
+    shapeHolder.style.opacity=0;
 
-    this.getPosition=function(){
-        return {"r":row,"c":col};
+
+    tileHolderDom.appendChild(shapeHolder);
+    var tile=new Tile(number,tileHolderDom);
+
+    svg.appendChild(tileHolderDom);
+
+    var markedForDeletion=false;
+
+    //this is the downside of using scope alone to emulate access modifiers;
+    //in java/c/c++/c#, instances of the same class can acess each other's
+    //private members, which isn't the case here
+    this.getTile=function(){
+        return tile;
+    }
+    this.setTile=function(newTile){
+        tile=newTile;
     }
 
-    this.getTransfrom=function(){
-        return transform;
+    this.getTranslateX=function(){
+        return translateX;
     }
+    this.getTranslateY=function(){
+        return translateY;
+    }
+
+    this.isEmpty=function(){
+        //return tileHolderDom.children.length>1;//only the click rectangle if empty
+        return tile===null;//only the click rectangle if empty
+    }
+
+    this.pullTilePermenant=function(fromTileHolder){
+        tile=fromTileHolder.getTile();
+        fromTileHolder.setTile(null);//will this activate the css transistion?
+        markedForDeletion=false;
+    }
+
     this.move=function(toTileHolder,shouldIncrement){
+        var x=toTileHolder.getTranslateX()-translateX;
+        var y=toTileHolder.getTranslateY()-translateY;
         tile.setOpacity(0);
-        tile.setTransform(toTileHolder.getTransfrom());
-        var movementChainFunction=function(e){
-            if(e.propertyName=="opacity"&&shouldIncrement){
-                tileGrid.runNext();
+        tile.setTransform("translate("+x+"px,"+y+"px)");
+        tile.listenForMovementTurn(
+            function(e){
+                if(e.propertyName=="opacity"&&shouldIncrement){
+                    tileGrid.runNext();
+                }
             }
+        );
+        markedForDeletion=true;
+    }
+    this.deleteIfNeeded=function(){
+        if(markedForDeletion){
+            tile.remove();
+            tile=null;
+            markedForDeletion=false;
         }
-        tile.listenForMovementTurn(movementChainFunction);
     }
 }
 
-function TileGrid(rows,cols,svg,numbers,transitionsList){//TODO: make singleton
+function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: make singleton
     this.testUpdate=function(id){
         grid[0][0].setId("2");
     }
@@ -154,8 +191,9 @@ function TileGrid(rows,cols,svg,numbers,transitionsList){//TODO: make singleton
         }
         grid.push(row);
     }
-    this.resetWith=function(newList){
-        this.transitionsList=newList;
+    this.resetWith=function(newTransitionList,newReplaceList){
+        this.transitionsList=newTransitionList;
+        this.replaceList=newReplaceList;
         this.currentTransition=0;
     },
     this.runNext=function(){
@@ -174,11 +212,30 @@ function TileGrid(rows,cols,svg,numbers,transitionsList){//TODO: make singleton
                 grid[frow][fcol].move(grid[trow][tcol],false);
             }
             this.currentTransition++;
-        }else{
-            console.log("done");
+        }else{//done
+            for(i=0;i<grid.length;i++){
+                for(j=0;j<grid.length;j++){
+                    grid[i][j].deleteIfNeeded();
+                }
+            }
+            for(i=grid.length-1;i>=0;i--){
+                for(j=grid.length-1;j>=0;j--){
+                    if(grid[i][j].isEmpty()){
+                        rowNum=i-1;
+                        while(rowNum>=0&&grid[rowNum][j].isEmpty()){
+                            rowNum--;
+                        }
+                        if(rowNum>=0){
+                            grid[i][j].pullTilePermenant(grid[rowNum][j]);
+                        }else{
+                            //new tile from the top with number from list
+                        }
+                    }
+                }
+            }
         }
     }
-    this.resetWith(transitionsList);
+    this.resetWith(transitionsList,replaceList);
 }
 
 
@@ -191,8 +248,11 @@ var main=function(){
                        [1,1,1,1,1],
                        [1,2,3,1,1],
                        [1,1,1,1,1]];
+
+    //server bfs should return these after tile is clicked
+
+    var replaceList=[1,4,2,1,3,1,3,4,1,1,1,1,2,2];
     var sampleTransitionList=[
-    //server bfs should return this after tile is clicked
         [
             {'fromNdxs': {'x':2,'y':0},'toNdxs': {'x':2,'y':1}}
         ],
@@ -220,7 +280,7 @@ var main=function(){
             {'fromNdxs': {'x':3,'y':4},'toNdxs': {'x':4,'y':4}}
         ]
     ];
-    grid=new TileGrid(5,5,display,buildTemplate,sampleTransitionList);
+    grid=new TileGrid(5,5,display,buildTemplate,sampleTransitionList,replaceList);
 
 }
 
