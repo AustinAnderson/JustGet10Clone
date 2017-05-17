@@ -36,6 +36,9 @@ function Tile(number,parentDom){
     this.removeMovementListener=function(movementChainFunction){
         tileHandle.removeEventListener("transitionend",movementChainFunction);
     }
+    this.getNumber=function(){
+        return number;
+    }
 
     var setNumber=function(fnumber){
         numberTextHandle.innerHTML=fnumber;
@@ -149,13 +152,43 @@ function TileHolder(row,col,number,svg,tileGrid){
         //return tileHolderDom.children.length>1;//only the click rectangle if empty
         return tile===null;//only the click rectangle if empty
     }
-
-    this.pullTilePermenant=function(fromTileHolder){
-        tile=fromTileHolder.getTile();
-        fromTileHolder.setTile(null);//will this activate the css transistion?
-        markedForDeletion=false;
+    this.isMarked=function(){
+        return markedForDeletion;
+    }
+    this.markForDeletion=function(){
+        markedForDeletion=true;
     }
 
+    this.pullTilePermenant=function(fromTileHolder){
+        fromTileHolder.moveNoOpacity(this,function(e){
+            fromTileHolder.markForDeletion();
+            //fromTileHolder.deleteIfNeeded();
+        });
+        var num=fromTileHolder.getTile().getNumber();
+        tile=new Tile(num,tileHolderDom);
+    }
+    this.pullNewTile=function(nextNumber){
+        /*
+        if(tile!==null){
+
+            tile.listenForMovementTurn(function(){
+                tile.remove();
+                tile=null;
+            });
+        }
+        */
+        //closure will delete old tile when ready
+        tile=new Tile(nextNumber, tileHolderDom);
+    }
+
+    this.moveNoOpacity=function(toTileHolder,callback){
+
+        var x=toTileHolder.getTranslateX()-translateX;
+        var y=toTileHolder.getTranslateY()-translateY;
+        tile.setTransform("translate("+x+"px,"+y+"px)");
+        markedForDeletion=true;
+        tile.listenForMovementTurn(callback);
+    }
     this.move=function(toTileHolder,shouldIncrement){
         var x=toTileHolder.getTranslateX()-translateX;
         var y=toTileHolder.getTranslateY()-translateY;
@@ -219,15 +252,17 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
                 }
             }
             for(i=grid.length-1;i>=0;i--){
+            //if(true){i=grid.length-1;
                 for(j=grid.length-1;j>=0;j--){
-                    if(grid[i][j].isEmpty()){
+                    if(grid[i][j].isEmpty()||grid[i][j].isMarked()){
                         rowNum=i-1;
-                        while(rowNum>=0&&grid[rowNum][j].isEmpty()){
+                        while(rowNum>=0&&(grid[rowNum][j].isEmpty()||grid[rowNum][j].isMarked())){
                             rowNum--;
                         }
                         if(rowNum>=0){
                             grid[i][j].pullTilePermenant(grid[rowNum][j]);
                         }else{
+                            grid[i][j].pullNewTile(replaceList.pop());
                             //new tile from the top with number from list
                         }
                     }
