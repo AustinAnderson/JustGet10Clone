@@ -167,18 +167,24 @@ function TileHolder(row,col,number,svg,tileGrid){
         var num=fromTileHolder.getTile().getNumber();
         tile=new Tile(num,tileHolderDom);
     }
+    var newFallingTile=function(number){
+        tile=new Tile(number,tileHolderDom);
+        //tile.setTransform("translate(0px,"+-translateY*2+"px)");
+        //tile.setTransform("translate(0px,0px)");
+    }
     this.pullNewTile=function(nextNumber){
-        /*
+        //*
         if(tile!==null){
 
             tile.listenForMovementTurn(function(){
                 tile.remove();
-                tile=null;
+                newFallingTile(nextNumber);
             });
+        }else{
+            newFallingTile(nextNumber);
         }
-        */
+        //*/
         //closure will delete old tile when ready
-        tile=new Tile(nextNumber, tileHolderDom);
     }
 
     this.moveNoOpacity=function(toTileHolder,callback){
@@ -278,6 +284,7 @@ var main=function(){
     globals=new Globals();
     var display=document.getElementById("display");
 
+    //*
     var buildTemplate=[[1,2,3,2,4],
                        [2,4,3,1,1],
                        [1,1,1,1,1],
@@ -287,6 +294,8 @@ var main=function(){
     //server bfs should return these after tile is clicked
 
     var replaceList=[1,4,2,1,3,1,3,4,1,1,1,1,2,2];
+    //*/
+
     var sampleTransitionList=[
         [
             {'fromNdxs': {'x':2,'y':0},'toNdxs': {'x':2,'y':1}}
