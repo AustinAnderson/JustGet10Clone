@@ -15,13 +15,16 @@ function Globals(){
 
 
 
-function Tile(number,parentDom){
+function Tile(number){
     var styleHandle=undefined;
     var numberStyleHandle=null;
     var numberTextHandle=null;
     var tileHandle=null;
 
 
+    this.getDom=function(){
+        return tileHandle;
+    }
     this.setOpacity=function(value){
         styleHandle.opacity=value;
     }
@@ -61,6 +64,8 @@ function Tile(number,parentDom){
         var border=document.createElementNS('http://www.w3.org/2000/svg',"g");
         border.setAttribute("class","border");
         border.style="transform: translate(5px,5px)";
+        var edgeStrs=[["bottom","top"],
+                      ["right","left"]];
         for(var x=0;x<2;x++){
             for(var y=0;y<2;y++){
                 var cornerCircle=document.createElementNS('http://www.w3.org/2000/svg',"circle");
@@ -84,6 +89,7 @@ function Tile(number,parentDom){
                 edge.setAttribute("height",""+h+"px");
                 edge.setAttribute("width",""+w+"px");
                 edge.setAttribute(attr,""+pos+"px");
+                edge.setAttribute("class",edgeStrs[x][y]+"Edge");
                 border.appendChild(cornerCircle);
                 border.appendChild(edge);
             }
@@ -105,7 +111,6 @@ function Tile(number,parentDom){
         tile.appendChild(border);
         tile.appendChild(inner);
         tileHandle=tile;
-        parentDom.appendChild(tile);
     }	
 
     render();
@@ -121,8 +126,9 @@ function TileHolder(row,col,number,svg,tileGrid){
     tileHolderDom.addEventListener("click",function(){console.log(""+row+col+"clicked");},true);
     tileHolderDom.setAttribute("class","bob");
     var shapeHolder=document.createElementNS('http://www.w3.org/2000/svg',"rect");
+    var sideLength=(globals.borderWidth*2+globals.cellSize);
     (function(){
-        var shapeHolderSideLength=""+(globals.borderWidth*2+globals.cellSize)+"px";
+        var shapeHolderSideLength=""+sideLength+"px";
         shapeHolder.setAttribute("height",shapeHolderSideLength);
         shapeHolder.setAttribute("width",shapeHolderSideLength);
     }())
@@ -131,7 +137,8 @@ function TileHolder(row,col,number,svg,tileGrid){
 
 
     tileHolderDom.appendChild(shapeHolder);
-    var tile=new Tile(number,tileHolderDom);
+    var tile=new Tile(number);
+    tileHolderDom.appendChild(tile.getDom());
 
     svg.appendChild(tileHolderDom);
 
@@ -158,48 +165,23 @@ function TileHolder(row,col,number,svg,tileGrid){
         //return tileHolderDom.children.length>1;//only the click rectangle if empty
         return tile===null;//only the click rectangle if empty
     }
-    this.isMarked=function(){
-        return markedForDeletion;
-    }
-    this.markForDeletion=function(){
-        markedForDeletion=true;
-    }
 
-    this.pullTilePermenant=function(fromTileHolder){
-        fromTileHolder.moveNoOpacity(this,function(e){
-            fromTileHolder.markForDeletion();
-            //fromTileHolder.deleteIfNeeded();
-        });
-        var num=fromTileHolder.getTile().getNumber();
-        tile=new Tile(num,tileHolderDom);
-    }
-    var newFallingTile=function(number){
-        tile=new Tile(number,tileHolderDom);
-        //tile.setTransform("translate(0px,"+-translateY*2+"px)");
-        //tile.setTransform("translate(0px,0px)");
-    }
     this.pullNewTile=function(nextNumber){
-        //*
-        if(tile!==null){
-
-            tile.listenForMovementTurn(function(){
-                tile.remove();
-                newFallingTile(nextNumber);
-            });
-        }else{
-            newFallingTile(nextNumber);
-        }
-        //*/
-        //closure will delete old tile when ready
+        tile=new Tile(nextNumber);
+        var y=-translateY-sideLength;
+        tile.setTransform("translate(0px,"+y+"px)");
+        tileHolderDom.appendChild(tile.getDom());
     }
 
-    this.moveNoOpacity=function(toTileHolder,callback){
+    this.pullTile=function(fromTileHolder){
 
-        var x=toTileHolder.getTranslateX()-translateX;
-        var y=toTileHolder.getTranslateY()-translateY;
-        tile.setTransform("translate("+x+"px,"+y+"px)");
-        markedForDeletion=true;
-        tile.listenForMovementTurn(callback);
+        
+        var y=fromTileHolder.getTranslateY()-translateY;
+        tile=new Tile(fromTileHolder.getTile().getNumber());
+        tile.setTransform("translate(0px,"+y+"px)");
+        fromTileHolder.delete();
+        tileHolderDom.appendChild(tile.getDom());
+
     }
     this.move=function(toTileHolder,shouldIncrement){
         var x=toTileHolder.getTranslateX()-translateX;
@@ -215,6 +197,10 @@ function TileHolder(row,col,number,svg,tileGrid){
         );
         markedForDeletion=true;
     }
+    this.delete=function(){
+        tile.remove();
+        tile=null;
+    }
     this.deleteIfNeeded=function(){
         if(markedForDeletion){
             tile.remove();
@@ -225,10 +211,10 @@ function TileHolder(row,col,number,svg,tileGrid){
 }
 
 function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: make singleton
-    this.testUpdate=function(id){
-        grid[0][0].setId("2");
-    }
     var grid=[];//of arrays of tileholders
+    this.debugGetGridDeleteMe=function(){
+        return grid;
+    }
     for(var i=0;i<cols;i++){
         var row=[];
         for(var j=0;j<rows;j++){
@@ -263,16 +249,15 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
                     grid[i][j].deleteIfNeeded();
                 }
             }
-            for(i=grid.length-1;i>=0;i--){
-            //if(true){i=grid.length-1;
-                for(j=grid.length-1;j>=0;j--){
-                    if(grid[i][j].isEmpty()||grid[i][j].isMarked()){
+            for(j=grid.length-1;j>=0;j--){
+                for(i=grid.length-1;i>=0;i--){
+                    if(grid[i][j].isEmpty()){
                         rowNum=i-1;
-                        while(rowNum>=0&&(grid[rowNum][j].isEmpty()||grid[rowNum][j].isMarked())){
+                        while(rowNum>=0&&grid[rowNum][j].isEmpty()){
                             rowNum--;
                         }
                         if(rowNum>=0){
-                            grid[i][j].pullTilePermenant(grid[rowNum][j]);
+                            grid[i][j].pullTile(grid[rowNum][j]);
                         }else{
                             grid[i][j].pullNewTile(replaceList.pop());
                             //new tile from the top with number from list
@@ -280,6 +265,15 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
                     }
                 }
             }
+            
+            for(i=0;i<grid.length;i++){
+                for(j=0;j<grid.length;j++){
+                    if(!grid[i][j].isEmpty()){
+                        grid[i][j].getTile().setTransform("translate(0px,0px)");//why doesn't this animate!!!!????
+                    }
+                }
+            }
+            
         }
     }
     this.resetWith(transitionsList,replaceList);
@@ -299,7 +293,7 @@ var main=function(){
 
     //server bfs should return these after tile is clicked
 
-    var replaceList=[1,4,2,1,3,1,3,4,1,1,1,1,2,2];
+    var replaceList=[1,1,2,1,3,1,3,4,1,3,1,1,2,2];
     //*/
 
     var sampleTransitionList=[

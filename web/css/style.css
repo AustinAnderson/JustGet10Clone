@@ -8,7 +8,8 @@
     fill: black;
 }
 .tile{
-    transition: transform .3s, opacity .2s; /**/
+    transition: transform .3s, opacity .2s; 
+    /*opacity has to be less than transform*/
 }
 .hiddenTile{
     display:none;
