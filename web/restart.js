@@ -81,7 +81,8 @@ function Tile(number,parentDom){
                 if(y==0){
                     pos=globals.cellSize;
                 }		
-                edge.style="height: "+h+"px; width: "+w+"px;";
+                edge.setAttribute("height",""+h+"px");
+                edge.setAttribute("width",""+w+"px");
                 edge.setAttribute(attr,""+pos+"px");
                 border.appendChild(cornerCircle);
                 border.appendChild(edge);
@@ -92,7 +93,9 @@ function Tile(number,parentDom){
         numberStyleHandle=inner;
         inner.style="transform: translate(5px,5px)";
         var box=document.createElementNS('http://www.w3.org/2000/svg',"rect");
-        box.style="height: "+globals.cellSize+"px; width: "+globals.cellSize+"px; stroke: black";
+        box.setAttribute("height",""+globals.cellSize+"px");
+        box.setAttribute("width",""+globals.cellSize+"px");
+        box.style="stroke: black";
         var text=document.createElementNS('http://www.w3.org/2000/svg',"text");
         text.setAttribute("dy","25px");
         text.setAttribute("dx","15px");
@@ -118,8 +121,11 @@ function TileHolder(row,col,number,svg,tileGrid){
     tileHolderDom.addEventListener("click",function(){console.log(""+row+col+"clicked");},true);
     tileHolderDom.setAttribute("class","bob");
     var shapeHolder=document.createElementNS('http://www.w3.org/2000/svg',"rect");
-    shapeHolder.style.height=""+(globals.borderWidth*2+globals.cellSize)+"px";
-    shapeHolder.style.width=""+(globals.borderWidth*2+globals.cellSize)+"px";
+    (function(){
+        var shapeHolderSideLength=""+(globals.borderWidth*2+globals.cellSize)+"px";
+        shapeHolder.setAttribute("height",shapeHolderSideLength);
+        shapeHolder.setAttribute("width",shapeHolderSideLength);
+    }())
     shapeHolder.style.transform="translate("+globals.borderWidth+"px,"+globals.borderWidth+"px)";
     shapeHolder.style.opacity=0;
 
