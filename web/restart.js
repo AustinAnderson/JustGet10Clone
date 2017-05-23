@@ -1,6 +1,9 @@
-function Globals(){
-    this.borderWidth=2;
-    this.cellSize=40;
+function Globals(sideTileCount){
+
+    this.cellSize=document.getElementById("display").getBoundingClientRect().height/(sideTileCount*1.125);
+    this.borderWidth=this.cellSize/20;
+    this.marginTop=this.borderWidth*2;
+    this.marginLeft=this.borderWidth*2;
     this.indexes2Coords=function(row,col){
         return {"x":((this.borderWidth*2+this.cellSize)*row),
                 "y":((this.borderWidth*2+this.cellSize)*col)};
@@ -31,6 +34,12 @@ function Tile(number){
     this.setTransform=function(value){
         styleHandle.transform=value;
     }
+    this.animateToZero=function(){
+        tileHandle.addEventListener("transitionend",function(){
+            tileHandle.setAttribute("class","tile");            
+        });
+        this.setTransform("translate(0px,0px)");
+    }
 
 
     this.listenForMovementTurn=function(movementChainFunction){
@@ -51,9 +60,13 @@ function Tile(number){
     this.remove=function(){
         tileHandle.remove();
     }
+    this.increment=function(){
+        number=number+1;
+        setNumber(number);
+    }
 
     var render=function(){
-
+        var margins="transform: translate("+globals.marginLeft+"px,"+globals.marginTop+"px)";
 
         var tile=document.createElementNS('http://www.w3.org/2000/svg',"g");
         tile.classList=["tile"];
@@ -63,7 +76,7 @@ function Tile(number){
 
         var border=document.createElementNS('http://www.w3.org/2000/svg',"g");
         border.setAttribute("class","border");
-        border.style="transform: translate(5px,5px)";
+        border.style=margins;
         var edgeStrs=[["bottom","top"],
                       ["right","left"]];
         for(var x=0;x<2;x++){
@@ -97,14 +110,18 @@ function Tile(number){
         var inner=document.createElementNS('http://www.w3.org/2000/svg',"g");
         inner.setAttribute("class","n"+number);
         numberStyleHandle=inner;
-        inner.style="transform: translate(5px,5px)";
+        inner.style=margins;
         var box=document.createElementNS('http://www.w3.org/2000/svg',"rect");
         box.setAttribute("height",""+globals.cellSize+"px");
         box.setAttribute("width",""+globals.cellSize+"px");
         box.style="stroke: black";
         var text=document.createElementNS('http://www.w3.org/2000/svg',"text");
-        text.setAttribute("dy","25px");
-        text.setAttribute("dx","15px");
+        text.setAttribute("dy",""+globals.cellSize*(2/3)+"px");
+        text.setAttribute("dx",""+globals.cellSize*(1/3)+"px");
+        text.setAttribute("font-size",""+globals.cellSize/2+"px");
+        text.setAttribute("class","cellText");
+        //text.setAttribute("dy","25px");
+        //text.setAttribute("dx","15px");
         numberTextHandle=text;
         inner.appendChild(box); 
         inner.appendChild(text);
@@ -118,13 +135,13 @@ function Tile(number){
 
     
 }
-function TileHolder(row,col,number,svg,tileGrid){
+function TileHolder(col,row,number,svg,tileGrid){
+   
     var tileHolderDom=document.createElementNS('http://www.w3.org/2000/svg',"g");
-    var translateX=((globals.borderWidth*2+globals.cellSize)*row);
-    var translateY=((globals.borderWidth*2+globals.cellSize)*col);
+    var translateX=((globals.borderWidth*2+globals.cellSize)*col);
+    var translateY=((globals.borderWidth*2+globals.cellSize)*row);
     tileHolderDom.style.transform="translate("+translateX+"px,"+translateY+"px)";
-    tileHolderDom.addEventListener("click",function(){console.log(""+row+col+"clicked");},true);
-    tileHolderDom.setAttribute("class","bob");
+    tileHolderDom.setAttribute("id",""+row+col);
     var shapeHolder=document.createElementNS('http://www.w3.org/2000/svg',"rect");
     var sideLength=(globals.borderWidth*2+globals.cellSize);
     (function(){
@@ -135,14 +152,42 @@ function TileHolder(row,col,number,svg,tileGrid){
     shapeHolder.style.transform="translate("+globals.borderWidth+"px,"+globals.borderWidth+"px)";
     shapeHolder.style.opacity=0;
 
-
-    tileHolderDom.appendChild(shapeHolder);
     var tile=new Tile(number);
     tileHolderDom.appendChild(tile.getDom());
+    tileHolderDom.appendChild(shapeHolder);
 
     svg.appendChild(tileHolderDom);
 
     var markedForDeletion=false;
+
+    var listenForReset=function(){
+        /*
+        var resetPair=ajax({'x':row,'y':col});
+        if(resetPair===undefined||resetPair===null){
+            error();
+        }
+        var resetList=resetPair.replaceList;
+        if(resetList===undefined||resetList===null){
+            error();
+        }
+        var newTransitionList=resetPair.transitionsList;
+        if(newTransitionList===undefined||newTransitionList===null){
+            error();
+        }
+        tileGrid.resetWith(resetList,newTransitionList);
+        //*/
+        console.log(""+row+col+"stops listening for clicks");
+        tileHolderDom.removeEventListener("click",listenForReset);//this tile shouldn't listen for clicks while it's moving
+        tileGrid.runNext();
+    }
+
+    var startListeningForResetClick=function(){
+        
+        console.log(""+row+col+"starts listening for clicks");
+        tileHolderDom.addEventListener("click",listenForReset);
+    }
+    tile.listenForMovementTurn(startListeningForResetClick);
+    startListeningForResetClick();
 
     //this is the downside of using scope alone to emulate access modifiers;
     //in java/c/c++/c#, instances of the same class can acess each other's
@@ -211,6 +256,9 @@ function TileHolder(row,col,number,svg,tileGrid){
 }
 
 function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: make singleton
+
+    
+    
     var grid=[];//of arrays of tileholders
     this.debugGetGridDeleteMe=function(){
         return grid;
@@ -244,6 +292,8 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
             }
             this.currentTransition++;
         }else{//done
+            var finalGridTile=this.transitionsList[this.transitionsList.length-1][0].toNdxs;
+            grid[finalGridTile.x][finalGridTile.y].getTile().increment();
             for(i=0;i<grid.length;i++){
                 for(j=0;j<grid.length;j++){
                     grid[i][j].deleteIfNeeded();
@@ -259,20 +309,22 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
                         if(rowNum>=0){
                             grid[i][j].pullTile(grid[rowNum][j]);
                         }else{
-                            grid[i][j].pullNewTile(replaceList.pop());
+                            grid[i][j].pullNewTile(this.replaceList.pop());
                             //new tile from the top with number from list
                         }
+                        grid[i][j].getTile().getDom().setAttribute("class","droppingTile");
                     }
                 }
             }
-            
-            for(i=0;i<grid.length;i++){
-                for(j=0;j<grid.length;j++){
-                    if(!grid[i][j].isEmpty()){
-                        grid[i][j].getTile().setTransform("translate(0px,0px)");//why doesn't this animate!!!!????
+            window.setTimeout(function(){//animate the drop down, requires timeout for browser to realize it needs to transition
+                for(i=0;i<grid.length;i++){
+                    for(j=0;j<grid.length;j++){
+                        if(!grid[i][j].isEmpty()){
+                            grid[i][j].getTile().animateToZero();
+                        }
                     }
-                }
-            }
+                }  
+            },50);
             
         }
     }
@@ -281,8 +333,10 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
 
 
 var main=function(){
-    globals=new Globals();
     var display=document.getElementById("display");
+    if (/Mobi/.test(navigator.userAgent)) {
+        display.setAttribute("class","mobileDisplay");
+    }
 
     //*
     var buildTemplate=[[1,2,3,2,4],
@@ -290,6 +344,18 @@ var main=function(){
                        [1,1,1,1,1],
                        [1,2,3,1,1],
                        [1,1,1,1,1]];
+    //*/
+    /*
+    var buildTemplate=[[1,2,3,2],
+                       [2,4,3,1],
+                       [1,1,1,1],
+                       [1,2,3,1]];
+                       //*/
+    /*
+    var buildTemplate=[[1,2,3],
+                       [2,4,3],
+                       [1,1,1]];
+                       //*/
 
     //server bfs should return these after tile is clicked
 
@@ -324,7 +390,33 @@ var main=function(){
             {'fromNdxs': {'x':3,'y':4},'toNdxs': {'x':4,'y':4}}
         ]
     ];
-    grid=new TileGrid(5,5,display,buildTemplate,sampleTransitionList,replaceList);
+
+                       
+    var tilesPerSide=buildTemplate.length;
+    globals=new Globals(tilesPerSide);
+    grid=new TileGrid(tilesPerSide,tilesPerSide,display,buildTemplate,sampleTransitionList,replaceList);
+
+    var newReplaceList=[1,4,1,1,2];
+
+    var newTransitionList=[
+        [
+            {'fromNdxs': {'x':1,'y':1},'toNdxs': {'x':1,'y':2}}
+        ],
+        [
+            {'fromNdxs': {'x':1,'y':2},'toNdxs': {'x':2,'y':2}},
+            {'fromNdxs': {'x':2,'y':3},'toNdxs': {'x':2,'y':2}}
+        ],
+        [
+            {'fromNdxs': {'x':2,'y':2},'toNdxs': {'x':3,'y':2}}
+        ],
+        [
+            {'fromNdxs': {'x':3,'y':2},'toNdxs': {'x':4,'y':2}}
+        ],
+    ];
+    window.debugRunAnother=function(){
+        grid.resetWith(newTransitionList,newReplaceList);
+        grid.runNext();
+    }
 
 }
 

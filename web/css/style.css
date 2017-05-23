@@ -1,32 +1,62 @@
 .display{
-    display: block;
+    background-color:grey;
+    display: inline-block;
     margin: auto;
-    height: 400;
-    width: 400;
+    width:300px;/*100%*/
+    height:300px;/*100vw*/
+}
+.mobileDisplay{
+    background-color:grey;
+    display: inline-block;
+    margin: auto;
+    width:100%;
+    height:100vw;
+}
+#container{
+    text-align: center;
+    background-color:darkgoldenrod;
+}
+#buttonsContainer{
+    padding-top:5%;
+    padding-bottom:5%;
+    height:50px;
+    background-color:darkgrey;
+}
+.saveButton{
+    width:48%;
+    height:100%;
+}
+.restartButton{
+    width:48%;
+    height:100%;
 }
 .border{
     fill: black;
 }
 .tile{
-    transition: transform .3s, opacity .2s; 
+    transition: transform .3s, opacity .2s;
     /*opacity has to be less than transform*/
 }
-.hiddenTile{
-    display:none;
+.droppingTile{
+    transition: transform 1s ease;
 }
 .n1{
     stroke: darkgreen;
     fill: lightgreen;
 }
+.n1 .cellText{fill: darkgreen;}
 .n2{
     stroke: blue;
     fill: lightblue;
 }
+.n2 .cellText{fill: blue;}
 .n3{
     stroke: red;
     fill: orange;
 }
+.n3 .cellText{fill: red;}
 .n4{
     stroke: orange;
     fill: red;
 }
+.n4 .cellText{fill: orange;}
