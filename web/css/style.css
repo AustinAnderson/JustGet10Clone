@@ -38,7 +38,7 @@
     /*opacity has to be less than transform*/
 }
 .droppingTile{
-    transition: transform 1s ease;
+    transition: transform .5s;
 }
 .n1{
     stroke: darkgreen;

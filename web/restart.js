@@ -160,35 +160,24 @@ function TileHolder(col,row,number,svg,tileGrid){
 
     var markedForDeletion=false;
 
-    var listenForReset=function(){
-        /*
-        var resetPair=ajax({'x':row,'y':col});
-        if(resetPair===undefined||resetPair===null){
-            error();
-        }
-        var resetList=resetPair.replaceList;
-        if(resetList===undefined||resetList===null){
-            error();
-        }
-        var newTransitionList=resetPair.transitionsList;
-        if(newTransitionList===undefined||newTransitionList===null){
-            error();
-        }
-        tileGrid.resetWith(resetList,newTransitionList);
-        //*/
-        console.log(""+row+col+"stops listening for clicks");
-        tileHolderDom.removeEventListener("click",listenForReset);//this tile shouldn't listen for clicks while it's moving
-        tileGrid.runNext();
+    var clickListener=function(){
+        console.log(""+row+","+col+" clicked");
+        //ajax
+        //tileGrid.resetWith(ajax result);
+        //tileGrid.RunTransitions();
     }
 
-    var startListeningForResetClick=function(){
-        
-        console.log(""+row+col+"starts listening for clicks");
-        tileHolderDom.addEventListener("click",listenForReset);
+    this.enableClickListening=function(){
+        tileHolderDom.addEventListener("click",clickListener);
     }
-    tile.listenForMovementTurn(startListeningForResetClick);
-    startListeningForResetClick();
+    this.disableClickListening=function(){
+        tileHolderDom.removeEventListener("click",clickListener);
+    }
+    this.enableClickListening();
 
+    this.getId=function(){
+        return tileHolderDom.id;
+    }
     //this is the downside of using scope alone to emulate access modifiers;
     //in java/c/c++/c#, instances of the same class can acess each other's
     //private members, which isn't the case here
@@ -274,7 +263,20 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
         this.transitionsList=newTransitionList;
         this.replaceList=newReplaceList;
         this.currentTransition=0;
-    },
+    }
+
+    var pendingCallBackCount=0;
+    var enableAllClickListenersIfDone=function(){
+        pendingCallBackCount--;
+        if(pendingCallBackCount<=0){
+            for(i=0;i<grid.length;i++){
+                for(j=0;j<grid[i].length;j++){
+                    grid[i][j].enableClickListening();//TODO: implement
+                }
+            }
+        }
+    }
+    var firstInRun=true;
     this.runNext=function(){
         if(this.currentTransition<this.transitionsList.length){
             var concurrentTransitionList=this.transitionsList[this.currentTransition];
@@ -313,6 +315,20 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
                             //new tile from the top with number from list
                         }
                         grid[i][j].getTile().getDom().setAttribute("class","droppingTile");
+                        pendingCallBackCount++;
+                        //closure captures a reference to vars outside, so when the function is called, grid[i][j] would be grid[0][0]
+                        //so we need to capture grid[i][j] on each iteration in a new variable
+                        //the immediatley executing function expression forces currentTileHolder variable to go out of scope 
+                        //and be recreated on the next iteration of the loop
+                        (function(){
+                            var currentTileHolder=grid[i][j];
+                            var selfRemovingCallback=function(){
+                                enableAllClickListenersIfDone();
+                                //set a call back to listen for the last tile to finish moving and enable all the tileholders to listen for clicks
+                                currentTileHolder.getTile().removeMovementListener(selfRemovingCallback);
+                            }
+                            grid[i][j].getTile().listenForMovementTurn(selfRemovingCallback);
+                        }());
                     }
                 }
             }
@@ -325,10 +341,26 @@ function TileGrid(rows,cols,svg,numbers,transitionsList,replaceList){//TODO: mak
                     }
                 }  
             },50);
-            
+            firstInRun=true;
         }
     }
     this.resetWith(transitionsList,replaceList);
+    this.RunTransitions=function(){
+        if(firstInRun){
+            disableAllClickListeners();//to be enabled by call back after all transition end's fire
+            firstInRun=false
+            this.runNext();
+        }
+    }
+
+    var disableAllClickListeners=function(){
+
+        for(i=0;i<grid.length;i++){
+            for(j=0;j<grid[i].length;j++){
+                grid[i][j].disableClickListening();//TODO: implement
+            }
+        }
+    }
 }
 
 
