@@ -3,25 +3,32 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Stack;
+import java.util.Deque;
+import java.util.ArrayDeque;
 import GenerateNumbers.ValueGenerator;
+import Util.TerminalColorMap;
 public class Grid{
     private List<CellHolder> cells;
+    private boolean terminalDebug=false;
     private int squareSize;
     private ValueGenerator valueGenerator=new ValueGenerator(this);
     public Grid(int size){
         cells=new ArrayList<>();
         squareSize=size;
         for(int i=0;i<squareSize*squareSize;i++){
-            cells.add(new CellHolder(String.format("%02d",i),valueGenerator));
+            cells.add(new CellHolder(expandNdx(i),valueGenerator));
         }
         for(int i=0;i<squareSize*squareSize;i++){
             setAdjList(cells.get(i),i);
         }
     }
+    public void setDebug(){
+        terminalDebug=true;
+    }
     //driver
     public static void main(String[] args){
         Grid g=new Grid(Integer.parseInt(args[0]));
+        g.setDebug();
         g.print();
         g.combineOn(2,2);
     }
@@ -52,39 +59,55 @@ public class Grid{
         return lost;
     }
     public void update(){
-        System.out.print("\u001b[2J\u001b[H");
-        System.out.flush();
-        print();
+        if(terminalDebug){
+            //System.out.print("\u001b[2J\u001b[H");
+            System.out.print("\u001b[H");
+            System.out.flush();
+            print();
+        }
     }
-    private void sleep(int time){
-        try{
-            Thread.sleep(time);
-        }catch(InterruptedException e){};
+    public void sleep(int time){
+        if(terminalDebug){
+            try{
+                Thread.sleep(time);
+            }catch(InterruptedException e){};
+        }
     }
 
     public void bfsClear(int i, int j){
-        Queue<CellHolder> bfsQ=new LinkedList<>();
+        Queue<Transition> bfsQ=new LinkedList<>();
+        Deque<Transition> animate=new ArrayDeque<>();
+        TransitionList tList=new TransitionList();
         CellHolder dontChange=cells.get(flattenNdx(i,j));
-        bfsQ.add(dontChange);
+        bfsQ.add(new Transition(dontChange,dontChange));
         CellHolder topNeighbor=null;
         resetAll();
-
-        while(bfsQ.peek()!=null){
-            if(topNeighbor!=null&&bfsQ.peek().getValue()==topNeighbor.getValue()){
+        while(bfsQ.peek()!=null&&bfsQ.peek().from!=null){
+            if(topNeighbor!=null&&!topNeighbor.beenVisited()&&
+                    bfsQ.peek().from.getValue()==topNeighbor.getValue()&&
+                    !bfsQ.peek().from.beenVisited()){
                 if(!topNeighbor.equals(dontChange)&&topNeighbor.getValue()!=0){
-                    bfsQ.add(topNeighbor);
+                    bfsQ.add(new Transition(topNeighbor,bfsQ.peek().from));
                 }
             }
-            topNeighbor=bfsQ.peek().nextCellHolder();
+            topNeighbor=bfsQ.peek().from.nextCellHolder();
             if(topNeighbor==null){
-                CellHolder removed=bfsQ.remove();
-                if(!removed.equals(dontChange)){
-                    removed.clear();
-                    update();
-                    sleep(100);
+                Transition removed=bfsQ.remove();
+                removed.from.setVisited();
+                if(!removed.from.equals(dontChange)){
+                    animate.addLast(removed);
                 }
             }
         }
+
+        while(animate.size()>0){
+            Transition out=animate.removeLast();
+            tList.addTransition(out);
+        }
+        tList.animate(this);
+        System.out.print("\u001b[2J\u001b[H");
+        print();
+        System.out.println(tList.print());
     }
 
     public void collapse(){
@@ -123,13 +146,23 @@ public class Grid{
     public void print(){
         for(int i=0;i<squareSize;i++){
             for(int j=0;j<squareSize;j++){
+                System.out.print(TerminalColorMap.clear());
                 System.out.print(cells.get(flattenNdx(i,j)).print()+" ");
             }
-            System.out.println(" "+i);
+            System.out.println(TerminalColorMap.clear()+" "+i);
         }
         System.out.println();
         for(int i=0;i<squareSize;i++){
-            System.out.print(i+" ");
+            if(i/10!=0){
+                System.out.print(i/10);
+            }else{
+                System.out.print(" ");
+            }
+            System.out.print(" ");
+        }
+        System.out.println();
+        for(int i=0;i<squareSize;i++){
+            System.out.print(i%10+" ");
         }
         System.out.println();
     }
@@ -173,6 +206,9 @@ public class Grid{
     //a[2][3]=>a[11]
     private int flattenNdx(int i,int j){
         return i*squareSize+j;
+    }
+    private String expandNdx(int flattened){
+        return "{ x:"+(flattened/squareSize)+", y:"+(flattened%squareSize)+"}";
     }
 
 }

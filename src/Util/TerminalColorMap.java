@@ -1,16 +1,25 @@
 package Util;
 public class TerminalColorMap{
     private final static String[] Colors=new String[]{
-        "\u001B[0m",
-        "\u001B[40m",
-        "\u001B[41m",
-        "\u001B[42m",
-        "\u001B[43m",
-        "\u001B[44m",
-        "\u001B[45m",
-        "\u001B[46m",
-        "\u001B[47m",
-        "\u001B[48m",
+        "\u001B[0m", 
+        //1
+        "\u001B[42;30m",//green
+        //2
+        "\u001B[02;44;34m",//blue
+        //3
+        "\u001B[02;43;35m",//yellow
+        //4
+        "\u001B[41m",//red
+        //5
+        "\u001B[01;40m",//black
+        //6
+        "\u001B[01;45m",//
+        //7
+        "\u001B[01;46m",//
+        //8
+        "\u001B[01;47m",//
+        //9
+        "\u001B[01;48m",//9
     };
     public static String get(int i){
         String toReturn=Colors[0];

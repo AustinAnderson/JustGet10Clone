@@ -9,6 +9,7 @@ public class CellHolder{
     private ValueGenerator valueGenerator;
     private String name;
     private int replaceCount=0;
+    private boolean visited=false;
 
     public CellHolder(String id,ValueGenerator valueGenerator){
         name=id;
@@ -19,6 +20,7 @@ public class CellHolder{
     public void clear(){
         next=0;
         cell=null;
+        visited=false;
     }
 
     public void shiftCellToMe(CellHolder other){
@@ -106,6 +108,13 @@ public class CellHolder{
     }
     public void resetIterator(){
         next=0;
+        visited=false;
+    }
+    public void setVisited(){
+        visited=true;
+    }
+    public boolean beenVisited(){
+        return visited;
     }
     public String getName(){
         return name;
