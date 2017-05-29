@@ -64,32 +64,6 @@ public class CellHolder{
         }
         return toReturn;
     }
-
-    public String toDebugString(){
-        StringBuilder builder=new StringBuilder();
-        builder.append("[");
-        builder.append(getName());
-        if(cell!=null){
-            builder.append("("+cell.toDebugString()+")");
-        }else{
-            builder.append("(null)");
-        }
-        builder.append(", {");
-        CellHolder next=nextCellHolder();
-        if(next!=null){
-            builder.append(next.getName());
-            next=nextCellHolder();
-        }
-        while(next!=null){
-            builder.append(", ");
-            builder.append(next.getName());
-            next=nextCellHolder();
-        }
-        builder.append("} ]");
-        resetIterator();
-        return builder.toString();
-    }
-
     public int getValue(){
         int toReturn=0;
         if(cell!=null){

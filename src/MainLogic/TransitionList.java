@@ -26,17 +26,19 @@ public class TransitionList{
         StringBuilder builder=new StringBuilder();
         builder.append("[\n");
         for(CellHolder h: map.keySet()){
-            builder.append("{ to: "+h+",\n");
-            builder.append("  from: [\n");
+            builder.append("    [\n");
             List<CellHolder> fromList=map.get(h);
             for(int i=0;i<fromList.size()-1;i++){
-                builder.append("           "+fromList.get(i)+",\n");
+                builder.append("       {");
+                builder.append("'fromNdxs': "+fromList.get(i)+",");
+                builder.append("'toNdxs': "+h+"}\n");
             }
-            builder.append("           "+fromList.get(fromList.size()-1)+"\n");
-            builder.append("        ]\n");
-            builder.append("},");
+            builder.append("       {");
+            builder.append("'fromNdxs': "+fromList.get(fromList.size()-1)+",");
+            builder.append("'toNdxs': "+h+"}\n");
+            builder.append("    ],\n");
         }
-        builder.deleteCharAt(builder.toString().length()-1);//extra comma
+        builder.deleteCharAt(builder.toString().length()-2);//extra comma, and newline
         builder.append("\n]");
         return builder.toString();
     }
