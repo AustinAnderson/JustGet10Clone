@@ -167,18 +167,6 @@ public class Grid{
         System.out.println();
     }
 
-    public String toDebugString(){
-        StringBuilder builder=new StringBuilder();
-        builder.append("<");
-        builder.append(cells.get(0).toDebugString());
-        for(int i=1;i<squareSize*squareSize;i++){
-            builder.append(", ");
-            builder.append(cells.get(i).toDebugString());
-        }
-        builder.append(">");
-        return builder.toString();
-    }
-
     private void setAdjList(CellHolder toSet,int index){
         if((index-squareSize)>=0){
             toSet.addAdjacentCellHolder(cells.get(index-squareSize));
@@ -208,7 +196,7 @@ public class Grid{
         return i*squareSize+j;
     }
     private String expandNdx(int flattened){
-        return "{ x:"+(flattened/squareSize)+", y:"+(flattened%squareSize)+"}";
+        return "{ 'x':"+(flattened/squareSize)+", 'y':"+(flattened%squareSize)+"}";
     }
 
 }

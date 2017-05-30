@@ -17,7 +17,4 @@ public class Cell{
     public String toString(){
         return TerminalColorMap.get(value)+value;
     }
-    public String toDebugString(){
-        return "|"+name+"="+value+"|";
-    }
 }
