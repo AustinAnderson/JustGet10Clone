@@ -15,14 +15,14 @@ public class Grid{
     private int squareSize;
     private int max=0;
     private RandomNumberGenerator generator=null;
-    private Grid(int size,int max,RandomNumberGenerator rng,int[][] existing){
+    private Grid(int size,int max,RandomNumberGenerator initializerRng,RandomNumberGenerator rng,int[][] existing){
     	this.max=max;
     	generator=rng;
         cells=new ArrayList<>();
         squareSize=size;
         for(int i=0;i<squareSize;i++){
         	for(int j=0;j<squareSize;j++){
-        		int toAdd=generator.next(max);
+        		int toAdd=initializerRng.next(max);
         		if(existing!=null){
         			toAdd=existing[i][j];
         		}
@@ -42,10 +42,10 @@ public class Grid{
     			}
     		}
     	}
-    	return new Grid(currentGrid.length,max,rng,currentGrid);
+    	return new Grid(currentGrid.length,max,rng,rng,currentGrid);
     }
-    public static Grid newGame(int size,RandomNumberGenerator rng){
-    	return new Grid(size,0,rng,null);
+    public static Grid newGame(int size,RandomNumberGenerator initializerRng,RandomNumberGenerator rng){
+    	return new Grid(size,0,initializerRng,rng,null);
     }
 
     public boolean hasLost(){//need to test this
@@ -72,7 +72,7 @@ public class Grid{
 		}
     	return toStringReturn.toString();
     }
-    public TransitionList bfsCombineOn(int i, int j){
+    private TransitionList bfsCombineOn(int i, int j){
     	int newVal=cells.get(flattenNdx(i,j)).getValue()+1;
     	if(newVal>max){
     		max=newVal;
