@@ -2,6 +2,6 @@
 *.swp
 a.out
 
-/bin/
+bin/
 .project
 .classpath

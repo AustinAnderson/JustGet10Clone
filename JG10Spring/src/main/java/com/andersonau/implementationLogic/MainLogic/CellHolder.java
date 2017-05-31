@@ -19,13 +19,7 @@ public class CellHolder{
         cell=new Cell(initialValue);
     }
 
-    public void clear(){
-        next=0;
-        cell=null;
-        visited=false;
-    }
-
-    public boolean canCombine(){//need to test this
+    public boolean canCombine(){
         boolean equalNeighbor=false;
         
         CellHolder next=nextCellHolder();
@@ -51,13 +45,8 @@ public class CellHolder{
         return toReturn;
     }
     public int getValue(){
-        int toReturn=0;
-        if(cell!=null){
-            toReturn=cell.getValue();
-        }
-        return toReturn;
+        return cell.getValue();
     }
-
     public void addAdjacentCellHolder(CellHolder toAdd){
         adjList.add(toAdd);
     }
@@ -76,6 +65,10 @@ public class CellHolder{
             next++;
         }
         return toReturn;
+    }
+    @Override
+    public String toString(){
+    	return "("+x+","+y+"):"+getValue();
     }
 }
 /*

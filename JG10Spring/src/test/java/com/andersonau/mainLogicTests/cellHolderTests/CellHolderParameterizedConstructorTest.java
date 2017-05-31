@@ -1,4 +1,4 @@
-package com.andersonau.mainLogicTests;
+package com.andersonau.mainLogicTests.cellHolderTests;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.Parameters;
 import com.andersonau.implementationLogic.MainLogic.CellHolder;
 
 @RunWith(Parameterized.class)
-public class TestCellHolderToJSON {
+public class CellHolderParameterizedConstructorTest {
 
 	@Parameters(name="new CellHolder(x: {0}, y: {1}, initialValue: {2}).toJSON()=={3}")
 	public static Collection<Object[]> data(){
@@ -46,7 +46,7 @@ public class TestCellHolderToJSON {
 	private int y;
 	private int initialValue;
 	private String expected;
-	public TestCellHolderToJSON(int i1,int i2,int i3,String expected){
+	public CellHolderParameterizedConstructorTest(int i1,int i2,int i3,String expected){
 		x=i1;
 		y=i2;
 		initialValue=i3;
@@ -62,5 +62,10 @@ public class TestCellHolderToJSON {
 	@Test
 	public void testGetValue(){
 		assertEquals(initialValue,new CellHolder(x,y,initialValue).getValue());
+	}
+	@Test
+	public void visited(){
+		CellHolder target=new CellHolder(x,y,initialValue);
+		assertFalse("expected visited to be false on instantiation", target.beenVisited());
 	}
 }
