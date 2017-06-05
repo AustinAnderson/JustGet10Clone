@@ -1,36 +1,36 @@
 package com.andersonau.implementationLogic.MainLogic;
 import java.util.LinkedHashMap;
+
 import java.util.List;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 public class TransitionList{
     //has to preserve order
     private LinkedHashMap<CellHolder,ArrayList<CellHolder>> map=new LinkedHashMap<CellHolder,ArrayList<CellHolder>>();
+    private HashSet<CellHolder> uniqueFroms=new HashSet<>();
     public void addTransition(Transition t){
-        if(map.get(t.to)==null){
-            map.put(t.to,new ArrayList<CellHolder>());
-        }
-        map.get(t.to).add(t.from);
+    	if(uniqueFroms.add(t.from)){//if we havn't seen this from cell,
+    		if(map.get(t.to)==null){//if first transition with this toCell, create the list
+            	map.put(t.to,new ArrayList<CellHolder>());
+        	}
+        	map.get(t.to).add(t.from);
+    	}
     }
-    public JSONArray toJSON(){
-    	JSONArray toReturn=new JSONArray();
+    public JsonArray toJson(){
+    	JsonArray toReturn=new JsonArray();
         for(CellHolder h: map.keySet()){
-        	JSONArray inner=new JSONArray();
-        	toReturn.put(inner);
+        	JsonArray inner=new JsonArray();
+        	toReturn.add(inner);
             List<CellHolder> fromList=map.get(h);
             for(int i=0;i<fromList.size();i++){
-            	JSONObject transition=new JSONObject();
-            	inner.put(transition);
-            	try {
-					transition.put("fromNdxs", fromList.get(i).toJSON());
-					transition.put("toNdxs", h.toJSON());
-				} catch (JSONException e) {
-					//logError
-				}
+            	JsonObject transition=new JsonObject();
+            	inner.add(transition);
+				transition.add("fromNdxs", fromList.get(i).toJson());
+				transition.add("toNdxs", h.toJson());
             }
         }
         return toReturn;

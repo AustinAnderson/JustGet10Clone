@@ -1,0 +1,83 @@
+.display{
+    background-color:grey;
+    display: inline-block;
+    margin: auto;
+    width:300px;/*100%*/
+    height:300px;/*100vw*/
+}
+.mobileDisplay{
+    background-color:grey;
+    display: inline-block;
+    margin: auto;
+    width:100%;
+    height:100vw;
+}
+#container{
+    text-align: center;
+    background-color:darkgoldenrod;
+}
+#buttonsContainer{
+    padding-top:5%;
+    padding-bottom:5%;
+    height:50px;
+    background-color:darkgrey;
+}
+.saveButton{
+    width:48%;
+    height:100%;
+}
+.restartButton{
+    width:48%;
+    height:100%;
+}
+.border{
+    fill: black;
+}
+.tile{
+    transition: transform .3s, opacity .2s;
+    /*opacity has to be less than transform*/
+}
+.droppingTile{
+    transition: transform .5s;
+}
+.n1{
+    stroke: #38B00B;
+    fill: #B9F349;
+}
+.n1 .cellText{fill: #38B00B;}
+.n2{
+    fill: #56BFFC;
+    stroke: #0F89FF;
+}
+.n2 .cellText{fill: #0F89FF;}
+.n3{
+    stroke: #FF761C;
+    fill: #FCC35E;
+}
+.n3 .cellText{fill: #FF761C;}
+.n4{
+    stroke: #FFCF99;
+    fill: #FE7256;
+}
+.n4 .cellText{fill: #FFCF99;}
+
+.n5{
+    stroke: #7BE89A;
+    fill: #009E86;
+}
+.n5 .cellText{fill: #7BE89A;}
+.n6{
+    stroke: #C7B6FF;
+    fill: #7762FB;
+}
+.n6 .cellText{fill: #C7B6FF;}
+.n7{
+    stroke: #FFBDA5;
+    fill: #F657C2;
+}
+.n7 .cellText{fill: #FFBDA5;}
+.n8{
+    stroke: orange;
+    fill: red;
+}
+.n8 .cellText{fill: orange;}

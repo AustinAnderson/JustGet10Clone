@@ -6,26 +6,32 @@ import java.util.Queue;
 import java.util.Deque;
 import java.util.ArrayDeque;
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 public class Grid{
     private List<CellHolder> cells;
     private int squareSize;
     private int max=0;
+    private final static int UNINITIALIZED_MAX=2;
     private RandomNumberGenerator generator=null;
-    private Grid(int size,int max,RandomNumberGenerator initializerRng,RandomNumberGenerator rng,int[][] existing){
+    public Grid(RandomNumberGenerator rng,int[][] existing){
+    	int max=0;
+    	for(int i=0;i<existing.length;i++){
+    		for(int j=0;j<existing[i].length;j++){
+    			if(existing[i][j]>max){
+    				max=existing[i][j];
+    			}
+    		}
+    	}
+    	int size=existing.length;
     	this.max=max;
     	generator=rng;
         cells=new ArrayList<>();
         squareSize=size;
         for(int i=0;i<squareSize;i++){
         	for(int j=0;j<squareSize;j++){
-        		int toAdd=initializerRng.next(max);
-        		if(existing!=null){
-        			toAdd=existing[i][j];
-        		}
+        		int toAdd=existing[i][j];
         		cells.add(new CellHolder(i,j,toAdd));
         	}
         }
@@ -33,19 +39,16 @@ public class Grid{
             setAdjList(cells.get(i),i);
         }
     }
-    public static Grid continuedGame(RandomNumberGenerator rng,int[][] currentGrid){
-    	int max=0;
-    	for(int i=0;i<currentGrid.length;i++){
-    		for(int j=0;j<currentGrid[i].length;j++){
-    			if(currentGrid[i][j]>max){
-    				max=currentGrid[i][j];
-    			}
+    public static String newGame(int sideLength,RandomNumberGenerator initializerRng){
+    	JsonArray rows=new JsonArray();
+    	for(int i=0;i<sideLength;i++){
+    		JsonArray cells=new JsonArray();
+    		for(int j=0;j<sideLength;j++){
+    			cells.add(initializerRng.next(UNINITIALIZED_MAX));
     		}
+    		rows.add(cells);
     	}
-    	return new Grid(currentGrid.length,max,rng,rng,currentGrid);
-    }
-    public static Grid newGame(int size,RandomNumberGenerator initializerRng,RandomNumberGenerator rng){
-    	return new Grid(size,0,initializerRng,rng,null);
+    	return rows.toString();
     }
 
     public boolean hasLost(){//need to test this
@@ -58,18 +61,14 @@ public class Grid{
         return lost;
     }
     public String combineOn(int i, int j){
-    	JSONObject toStringReturn=new JSONObject();
+    	JsonObject toStringReturn=new JsonObject();
     	TransitionList tList=bfsCombineOn(i,j);
-    	try {
-			toStringReturn.put("transitionList", tList.toJSON());
-            JSONArray replaceList=new JSONArray();
-            for(int k=0;k<tList.size();k++){
-                replaceList.put(generator.next(max));
-            }
-            toStringReturn.put("replaceList", replaceList);
-		} catch (JSONException e) {
-			//log error
-		}
+        toStringReturn.add("transitionList", tList.toJson());
+        JsonArray replaceList=new JsonArray();
+        for(int k=0;k<tList.size();k++){
+            replaceList.add(generator.next(max));
+        }
+        toStringReturn.add("replaceList", replaceList);
     	return toStringReturn.toString();
     }
     private TransitionList bfsCombineOn(int i, int j){

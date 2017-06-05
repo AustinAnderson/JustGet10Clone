@@ -13,8 +13,8 @@ import com.andersonau.implementationLogic.MainLogic.Grid;
 public class RestControllers{
 	
 	@RequestMapping(value="/moveOn/{row}/{col}", method=RequestMethod.POST)
-	public String moveOn(@PathVariable int row,@PathVariable int col, @RequestBody int[][] grid){
-		return Grid.continuedGame(new PlainGenerator(), grid).combineOn(row, col);
+	public String moveOn(@PathVariable int row,@PathVariable int col, @RequestBody int[][] gridData){
+		return new Grid(new PlainGenerator(),gridData).combineOn(row, col);
 	}
 	
 }

@@ -4,6 +4,9 @@ import java.util.List;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import java.util.ArrayList;
 public class CellHolder{
     private List<CellHolder> adjList=new ArrayList<>();
@@ -33,15 +36,10 @@ public class CellHolder{
     }
 
 
-    public JSONObject toJSON(){
-        JSONObject toReturn=new JSONObject();
-        try {
-			toReturn.put("row", row);
-			toReturn.put("col", col);
-		} catch (JSONException e) {
-			//log error move on
-			
-		}
+    public JsonObject toJson(){
+        JsonObject toReturn=new JsonObject();
+		toReturn.addProperty("row", row);
+		toReturn.addProperty("col", col);
         return toReturn;
     }
     public int getValue(){

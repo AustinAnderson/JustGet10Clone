@@ -1,0 +1,19 @@
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" id="styles" href="../css/style.css"/>
+<!--<script type="text/javascript" src="../js/run.js"></script>-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="../restart.js"></script>
+</head>
+<body>
+<div id="container">
+<svg id="display" class="display" th:onload="${'window.buildTemplate='+gridNums+'; main();'}">
+</svg>
+<div id="buttonsContainer" >
+<button id="save" class="saveButton">save</button>
+<button id="restart" class="restartButton">restart</button>
+</div>
+</div>
+</body>
+</html>

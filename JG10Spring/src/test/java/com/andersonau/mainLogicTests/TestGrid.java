@@ -2,21 +2,23 @@ package com.andersonau.mainLogicTests;
 
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assume;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 import com.andersonau.implementationLogic.MainLogic.Grid;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 @RunWith(Parameterized.class)
 public class TestGrid {
@@ -109,9 +111,49 @@ public class TestGrid {
 		}catch(Exception ex){
             Assume.assumeTrue("initializing expected can't combine after string failed "+ex, false);
 		}
+		
+		int[][] dupFrom={
+			{1,1,2},
+			{1,1,2},
+			{1,2,2}
+		};
+		String expectedOutputDupFrom=null;
+		try{
+			expectedOutputDupFrom=new JSONObject()
+                .put("transitionList",new JSONArray()
+                    .put(new JSONArray()
+                        .put(new JSONObject()
+                            .put("fromNdxs", new JSONObject().put("col", 1).put("row", 0))
+                            .put("toNdxs", new JSONObject().put("col", 1).put("row", 1))
+                        )
+                    )
+                    .put(new JSONArray()
+                        .put(new JSONObject()
+                            .put("fromNdxs", new JSONObject().put("col", 1).put("row", 1))
+                            .put("toNdxs", new JSONObject().put("col", 0).put("row", 1))
+                        )
+                        .put(new JSONObject()
+                            .put("fromNdxs", new JSONObject().put("col", 0).put("row", 0))
+                            .put("toNdxs", new JSONObject().put("col", 0).put("row", 1))
+                        )
+                    )
+                    .put(new JSONArray()
+                        .put(new JSONObject()
+                            .put("fromNdxs", new JSONObject().put("col", 0).put("row", 1))
+                            .put("toNdxs", new JSONObject().put("col", 0).put("row", 2))
+                        )
+                    )
+				)
+				.put("replaceList", new JSONArray().put(3).put(3).put(3).put(3))
+            .toString();
+					
+		}catch(Exception ex){
+            Assume.assumeTrue("initializing expected for dupFrom test failed "+ex, false);
+		}
 		return Arrays.asList(new Object[][]{
 			{4,3,canCombineAfter,canCombineAfterReplaceList,true,expectedOutputCanCombine,"can combine after"},
 			{3,2,cantCombineAfter,cantCombineAfterReplaceList,false,expectedOutputCantCombine,"can't combine after"},
+			{2,0,dupFrom,3,true,expectedOutputDupFrom,"bfs potentially duplicate from"},
 		});
 	}
 	
@@ -133,16 +175,20 @@ public class TestGrid {
 	
 	public void testBFS(String expected,Grid grid){
 		String actual=grid.combineOn(row, col);
-		
-		assertEquals("\ntesting if grid combine produces correct output\n",expected,actual);
+		JsonParser parser=new JsonParser();
+		JsonElement actualJSON=parser.parse(actual);
+		JsonElement expectedJSON=parser.parse(expected);
+		assertTrue("expected "+expected+" but was "+actual,expectedJSON.equals(actualJSON));
 		assertEquals("\ntesting if grid can combine after done\n",expectedCombinable,!grid.hasLost());
 	}
+	/*
 	@Test
 	public void testNewGrid(){
 		testBFS(expected,Grid.newGame(5, new MockInitializingRng(grid),new MockReplacementRng(replaceNum)));
 	}
+	*/
 	@Test
 	public void testExistingGrid(){
-		testBFS(expected,Grid.continuedGame(new MockReplacementRng(replaceNum),grid));
+		testBFS(expected,new Grid(new MockReplacementRng(replaceNum),grid));
 	}
 }
