@@ -10,12 +10,12 @@ public class CellHolder{
     private int next=0;
     private Cell cell=null;
     private boolean visited=false;
-    private int x;
-    private int y;
+    private final int row;
+    private final int col;
 
-    public CellHolder(int x,int y,int initialValue){
-    	this.x=x;
-    	this.y=y;
+    public CellHolder(int y,int x,int initialValue){
+    	this.row=y;
+    	this.col=x;
         cell=new Cell(initialValue);
     }
 
@@ -36,8 +36,8 @@ public class CellHolder{
     public JSONObject toJSON(){
         JSONObject toReturn=new JSONObject();
         try {
-			toReturn.put("x", x);
-			toReturn.put("y", y);
+			toReturn.put("row", row);
+			toReturn.put("col", col);
 		} catch (JSONException e) {
 			//log error move on
 			
@@ -68,7 +68,7 @@ public class CellHolder{
     }
     @Override
     public String toString(){
-    	return "("+x+","+y+"):"+getValue();
+    	return "("+row+","+col+"):"+getValue();
     }
 }
 /*

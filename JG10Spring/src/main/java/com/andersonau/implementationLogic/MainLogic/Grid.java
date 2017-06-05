@@ -61,7 +61,7 @@ public class Grid{
     	JSONObject toStringReturn=new JSONObject();
     	TransitionList tList=bfsCombineOn(i,j);
     	try {
-			toStringReturn.put("transitionList", bfsCombineOn(i,j).toJSON());
+			toStringReturn.put("transitionList", tList.toJSON());
             JSONArray replaceList=new JSONArray();
             for(int k=0;k<tList.size();k++){
                 replaceList.put(generator.next(max));
