@@ -62,7 +62,13 @@ public class Grid{
     }
     public String combineOn(int i, int j){
     	JsonObject toStringReturn=new JsonObject();
-    	TransitionList tList=bfsCombineOn(i,j);
+    	
+    	Deque<Transition> animate=internalBfsOn(i,j);
+        TransitionList tList=new TransitionList();
+        while(animate.size()>0){
+            Transition out=animate.removeLast();
+            tList.addTransition(out);
+        }
         toStringReturn.add("transitionList", tList.toJson());
         JsonArray replaceList=new JsonArray();
         for(int k=0;k<tList.size();k++){
@@ -71,14 +77,21 @@ public class Grid{
         toStringReturn.add("replaceList", replaceList);
     	return toStringReturn.toString();
     }
-    private TransitionList bfsCombineOn(int i, int j){
+    public String bfsOn(int i,int j){
+    	JsonArray toStringReturn=new JsonArray();
+    	Deque<Transition> animate=internalBfsOn(i,j);
+    	while(animate.size()>0){
+    		toStringReturn.add(animate.remove().to.toJson());
+    	}
+    	return toStringReturn.toString();
+    }
+    private Deque<Transition> internalBfsOn(int i, int j){
     	int newVal=cells.get(flattenNdx(i,j)).getValue()+1;
     	if(newVal>max){
     		max=newVal;
     	}
         Queue<Transition> bfsQ=new LinkedList<>();
         Deque<Transition> animate=new ArrayDeque<>();
-        TransitionList tList=new TransitionList();
         CellHolder dontChange=cells.get(flattenNdx(i,j));
         bfsQ.add(new Transition(dontChange,dontChange));
         CellHolder topNeighbor=null;
@@ -100,11 +113,7 @@ public class Grid{
             }
         }
 
-        while(animate.size()>0){
-            Transition out=animate.removeLast();
-            tList.addTransition(out);
-        }
-        return tList;
+        return animate;
     }
 
     private void setAdjList(CellHolder toSet,int index){

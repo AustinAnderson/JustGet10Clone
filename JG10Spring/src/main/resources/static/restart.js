@@ -267,10 +267,10 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
         url: "/moveOn/"+row+"/"+col,
         data: JSON.stringify(numberGrid),
         success: function(response){
-        	console.log(JSON.stringify(numberGrid));
-        	console.log(JSON.stringify(response));
-        	that.resetWith(response.transitionList,response.replaceList);
-        	that.RunTransitions();
+        	if(response.transitionList.length!=0&&response.replaceList.length!=0){
+        		that.resetWith(response.transitionList,response.replaceList);
+        		that.RunTransitions();
+        	}
         },
         dataType:"json",
         contentType: "application/json"});

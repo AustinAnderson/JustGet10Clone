@@ -1,3 +1,4 @@
+
 .display{
     background-color:grey;
     display: inline-block;
@@ -12,9 +13,80 @@
     width:100%;
     height:100vw;
 }
+#messageInnerContainer{
+	top:50%;
+	transform:translate(0,-50%);
+	position:absolute; 
+	margin:auto;
+	left:0;
+	right:0;
+	height:80%;
+	width:80%;
+}
+
+#messageDisplayContainer{
+	top:0;
+	left:0;
+	right:5%;
+	bottom:10%;
+	margin:auto;
+	position:absolute;
+	background-color:grey;
+	border-radius:10px;
+	height:50%;
+	width:80%;
+	box-shadow: 10px 10px 5px #222222;
+	transition: opacity .75s;
+	opacity: 0;/*1   switch between these two to display window*/
+	display:none;/*inline*/
+}
+#highScoreDisplayBox{
+	width:40%;
+	text-align:center;
+	box-shadow: 
+	  0 1px 2px #fff, /*bottom external highlight*/
+	  0 -1px 1px #666, /*top external shadow*/ 
+	  inset 0 -1px 1px rgba(0,0,0,0.5), /*bottom internal shadow*/ 
+	  inset 0 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
+}
+#highScoreText{
+	display:flex;
+	flex-direction: col;
+	font-size:80%;
+	justify-content:center;	
+}
+
+#textDisplay{
+	font-size:150%;
+	font-family:arial;
+	display:flex;
+	height:50%
+}
+#textDisplayText{
+	width:60%;
+	margin-top:4%;
+	display:flex;
+}
+#restartInner{
+	position: absolute;
+	margin:auto;
+	left:0;
+	right:0;
+	margin-top:5%;
+	height:40%;
+	width:100%;
+	font-size:100%;
+	font-family:arial;
+}
 #container{
     text-align: center;
     background-color:darkgoldenrod;
+	position:relative;
+	width:400px;
+	
+}
+#container .mobileDisplay{
+	width:100%;
 }
 #buttonsContainer{
     padding-top:5%;
@@ -34,7 +106,7 @@
     fill: black;
 }
 .tile{
-    transition: transform .3s, opacity .2s;
+    transition: transform .15s, opacity .1s;
     /*opacity has to be less than transform*/
 }
 .droppingTile{

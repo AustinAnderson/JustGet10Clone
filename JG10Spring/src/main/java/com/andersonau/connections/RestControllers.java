@@ -17,4 +17,9 @@ public class RestControllers{
 		return new Grid(new PlainGenerator(),gridData).combineOn(row, col);
 	}
 	
+	@RequestMapping(value="/bfsOn/{row}/{col}", method=RequestMethod.POST)
+	public String bfsOn(@PathVariable int row,@PathVariable int col, @RequestBody int[][] gridData){
+		return new Grid(new PlainGenerator(),gridData).bfsOn(row, col);
+	}
+	
 }
