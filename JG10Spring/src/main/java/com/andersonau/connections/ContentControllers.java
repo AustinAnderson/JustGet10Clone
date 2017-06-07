@@ -5,9 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.andersonau.implementationLogic.GenerateNumbers.InitializerRng;
 import com.andersonau.implementationLogic.GenerateNumbers.MimicOriginalInitializerRNG;
-import com.andersonau.implementationLogic.GenerateNumbers.PlainGenerator;
 import com.andersonau.implementationLogic.MainLogic.Grid;
 
 

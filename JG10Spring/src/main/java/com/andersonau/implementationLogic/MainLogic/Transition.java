@@ -6,7 +6,4 @@ public class Transition{
         to=t;
         from=f;
     }
-    public String print(){
-        return ""+to+"<-"+from;
-    }
 }
