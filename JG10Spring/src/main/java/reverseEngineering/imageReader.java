@@ -1,6 +1,10 @@
 package reverseEngineering;
 
+import java.awt.AWTException;
 import java.awt.Color;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -57,9 +61,17 @@ class BfsPoint{
 	}
 }
 public class imageReader {
+	public static Map<Integer,Integer> colorMap=new HashMap<>();
+	//reading from vnc screen share of phone, will change based on window position and resolution
+	public static final int step=85;
+	public static final int startX=56+((3*step)/4);
+	public static final int startY=284+((3*step)/4);
+	
+	/*//reading from screenshot, won't change unless I change phones
 	public static final int step=185;
 	public static final int startX=75+((3*step)/4);
 	public static final int startY=510+((3*step)/4);
+	*/
 	public static String toWebColor(Color c){
 		return String.format("#%02x%02x%02x", c.getRed(),c.getGreen(),c.getBlue());
 	}
@@ -68,43 +80,41 @@ public class imageReader {
 		rgb[0] = (rgbColor & 0xff0000) >> 16;//red
 		rgb[1] = (rgbColor & 0x00ff00) >> 8;//green
 		rgb[2] = (rgbColor & 0x0000ff) >> 0;//blue
-		int threshold=80;
+		int threshold=60;
+		//int threshold=80;
 		for(int i=0;i<rgb.length;i++){
 			rgb[i]=(rgb[i]/threshold)*threshold;
 		}
 		return new Color(rgb[0],rgb[1],rgb[2]).getRGB();
 		
 	}
-
-	public static Map<Integer,Integer> colorMap=new HashMap<Integer,Integer>(){
-		private static final long serialVersionUID = 1L;
-		{
-			put(-6230016,1);  
-			put(-11493136,2);  
-			put(-1007536,3);  
-			put(-1028016,4);  
-			put(-16756656,5);  
-			put(-11513616,6);  
-			put(-1027936,7);  
-			put(-6291456,8);  
-			put(-987136,9); 
-
-		}
-	};
 	public static int[][] getNumbers(String filePath){
-		
 		BufferedImage img=null;
 		try{
 			img=ImageIO.read(new File(filePath));
 		}catch(IOException ex){
 			ex.printStackTrace();
 		}
+		return getNumbers(img);
+	}
+	public static int[][] getNumbers(BufferedImage img){
+		
 		int[][] toReturn=new int[5][];
 		for(int i=0;i<5;i++){
 			toReturn[i]=new int[5];
 			for(int j=0;j<5;j++){
-				int value=loosePrecision(img.getRGB(startX+step*j, startY+step*i));
-				toReturn[i][j]=colorMap.get(value);
+				int x=startX+step*j;
+				int y=startY+step*i;
+				int value=loosePrecision(img.getRGB(x, y));
+				try{
+					toReturn[i][j]=colorMap.get(value);
+				}catch(NullPointerException ex){
+					System.err.println("null ptr exception ("+i+","+j+")");
+					System.err.println("at ("+x+","+y+")");
+					System.err.println("value: "+value);
+					System.err.println("value: "+toWebColor(new Color(value)));
+					throw ex;
+				}
 			}
 		}
 		return toReturn;
@@ -153,7 +163,49 @@ public class imageReader {
 		}
 		return builder.toString();
 	}
-	public static void main(String[] args){
+	private static final int[][] colorKeyValues={
+		{3,4,1,2,1},
+		{4,3,2,2,4},
+		{4,1,1,3,6},
+		{4,3,1,3,8},
+		{7,3,5,5,9}
+	};
+	public static void initMap(Robot r,Scanner s){//pullUp colorKey screenshot
+		
+		Rectangle screen=new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+		BufferedImage img=r.createScreenCapture(screen);
+		for(int i=0;i<5;i++){
+			for(int j=0;j<5;j++){
+				r.mouseMove(startX+step*j, startY+step*i);
+				/*
+				int key=loosePrecision(img.getRGB(startX+step*j, startY+step*i));
+				System.out.print(toWebColor(new Color(key))+":"+colorKeyValues[i][j]+" ");
+				colorMap.put(key, colorKeyValues[i][j]);
+				*/
+				s.nextLine();
+			}
+			System.out.println();
+		}
+		System.out.println("colors initialized, press enter to continue");
+		s.nextLine();
+	}
+	public static void main(String[] args) throws AWTException{
+		Robot r=new Robot();
+		Scanner s=new Scanner(System.in);
+		initMap(r,s);
+		Rectangle screen=new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+		BufferedImage img=r.createScreenCapture(screen);
+		int[][] grid=getNumbers(img);
+		for(int i=0;i<grid.length;i++){
+			for(int j=0;j<grid[i].length;j++){
+				System.out.print(grid[i][j]+", ");
+			}
+			System.out.println();
+		}
+		
+	}
+	public static void _main(String[] args){
+		
 		
 		String workingDir="C:/Users/ande5435/Desktop";
 		String startFilePath=workingDir+"/begin.png";
