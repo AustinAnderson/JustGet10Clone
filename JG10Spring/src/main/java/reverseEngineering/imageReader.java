@@ -61,17 +61,27 @@ class BfsPoint{
 	}
 }
 public class imageReader {
-	public static Map<Integer,Integer> colorMap=new HashMap<>();
+	//public static Map<Integer,Integer> colorMap=new HashMap<>();
+	public static Map<Integer,Integer> colorMap=new HashMap<Integer,Integer>(){
+		{
+			put(-1007536,3); put(-1028016,4); put(-6230016,1); put(-11493136,2); put(-6230016,1); 
+			put(-1028016,4); put(-1007536,3); put(-11493136,2); put(-11493136,2); put(-1028016,4); 
+			put(-1028016,4); put(-6230016,1); put(-6230016,1); put(-1007536,3); put(-11513616,6); 
+			put(-1028016,4); put(-1007536,3); put(-6230016,1); put(-1007536,3); put(-6291456,8); 
+			put(-1027936,7); put(-1007536,3); put(-16756656,5); put(-16756656,5); put(-987136,9); 
+		}
+	};
 	//reading from vnc screen share of phone, will change based on window position and resolution
+	/*
 	public static final int step=85;
 	public static final int startX=56+((3*step)/4);
 	public static final int startY=284+((3*step)/4);
 	
-	/*//reading from screenshot, won't change unless I change phones
+	//*///reading from screenshot, won't change unless I change phones
 	public static final int step=185;
 	public static final int startX=75+((3*step)/4);
 	public static final int startY=510+((3*step)/4);
-	*/
+	//*/
 	public static String toWebColor(Color c){
 		return String.format("#%02x%02x%02x", c.getRed(),c.getGreen(),c.getBlue());
 	}
@@ -80,8 +90,8 @@ public class imageReader {
 		rgb[0] = (rgbColor & 0xff0000) >> 16;//red
 		rgb[1] = (rgbColor & 0x00ff00) >> 8;//green
 		rgb[2] = (rgbColor & 0x0000ff) >> 0;//blue
-		int threshold=60;
-		//int threshold=80;
+		//int threshold=60;
+		int threshold=80;
 		for(int i=0;i<rgb.length;i++){
 			rgb[i]=(rgb[i]/threshold)*threshold;
 		}
@@ -119,6 +129,15 @@ public class imageReader {
 		}
 		return toReturn;
 	}
+	public static int[] aggregate(int[][] data){
+		int[] toReturn=new int[10];
+		for(int i=0;i<data.length;i++){
+			for(int j=0;j<data[i].length;j++){
+				toReturn[data[i][j]]++;
+			}
+		}
+		return toReturn;
+	}
 	public static int max(int[][] data){
 		int max=0;
 		for(int i=0;i<data.length;i++){
@@ -147,13 +166,17 @@ public class imageReader {
 	}
 	public static String getReplacedTileList(int[][] before,int[][] after, int rowCombinedOn,int colCombinedOn){
 		StringBuilder builder=new StringBuilder();
-		int max=max(before);
+		int values[]=aggregate(before);
+		builder.append("[");
+		for(int i=1;i<values.length;i++){
+			builder.append(i+":"+values[i]+", ");
+		}
+		builder.append("]  ");
 		ArrayList<BfsPoint> matching=bfs(before,rowCombinedOn,colCombinedOn);
 		int[] tilesPerCol=new int[5];
 		for(int i=0;i<matching.size();i++){
 			tilesPerCol[matching.get(i).col]++;
 		}
-		builder.append(max+": ");
 		for(int col=0;col<after[0].length;col++){
 			for(int row=0;row<after.length;row++){
 				if(row<tilesPerCol[col]){
@@ -189,7 +212,7 @@ public class imageReader {
 		System.out.println("colors initialized, press enter to continue");
 		s.nextLine();
 	}
-	public static void main(String[] args) throws AWTException{
+	public static void __main(String[] args) throws AWTException{
 		Robot r=new Robot();
 		Scanner s=new Scanner(System.in);
 		initMap(r,s);
@@ -204,7 +227,33 @@ public class imageReader {
 		}
 		
 	}
-	public static void _main(String[] args){
+	public static void configureMap(){
+		BufferedImage img=null;
+		try{
+			img=ImageIO.read(new File("C:/Users/ande5435/Desktop/key.png"));
+		}catch(IOException ex){
+			ex.printStackTrace();
+		}
+		for(int i=0;i<5;i++){
+			for(int j=0;j<5;j++){
+				int x=startX+step*j;
+				int y=startY+step*i;
+				int value=loosePrecision(img.getRGB(x, y));
+				System.out.print("put("+value+","+colorKeyValues[i][j]+"); ");
+			}
+			System.out.println();
+		}
+		int[][] data=getNumbers(img);
+		for(int i=0;i<data.length;i++){
+			for(int j=0;j<data[i].length;j++){
+				System.out.print(data[i][j]+" ");
+				
+			}
+			System.out.println();
+		}
+		
+	}
+	public static void main(String[] args){
 		
 		
 		String workingDir="C:/Users/ande5435/Desktop";

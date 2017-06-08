@@ -2,14 +2,14 @@ package com.andersonau.mainLogicTests;
 
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
 
-public class MockReplacementRng extends RandomNumberGenerator{
+public class MockReplacementRng implements RandomNumberGenerator{
 
 	private final int pullFrom;
 	public MockReplacementRng(int pullFrom){
 		this.pullFrom=pullFrom;
 	}
 	@Override
-	protected int nextInternal(int max) {
+	public int next(int[][] gridNumbers) {
 		return pullFrom;
 	}
 

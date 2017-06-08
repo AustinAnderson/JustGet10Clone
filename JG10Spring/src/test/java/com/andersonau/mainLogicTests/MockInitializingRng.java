@@ -1,8 +1,8 @@
 package com.andersonau.mainLogicTests;
 
-import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
+import com.andersonau.implementationLogic.GenerateNumbers.InitializerRandomNumberGenerator;
 
-public class MockInitializingRng extends RandomNumberGenerator{
+public class MockInitializingRng implements InitializerRandomNumberGenerator{
 	private final int[][] pullFrom;
 	private int currentRowIndex=0;
 	private int currentColIndex=0;
@@ -13,9 +13,10 @@ public class MockInitializingRng extends RandomNumberGenerator{
 		next=pullFrom[currentColIndex][currentRowIndex];
 	}
 	@Override
-	protected int nextInternal(int max) {
+	public int next() {
 		if(empty){
 			throw new IllegalArgumentException("all tiles should be initialized");
+		
 		}
 		next=pullFrom[currentColIndex][currentRowIndex];
 		currentRowIndex++;

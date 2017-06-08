@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Deque;
 import java.util.ArrayDeque;
+
+import com.andersonau.implementationLogic.GenerateNumbers.InitializerRandomNumberGenerator;
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -12,20 +14,11 @@ import com.google.gson.JsonObject;
 public class Grid{
     private List<CellHolder> cells;
     private int squareSize;
-    private int max=0;
-    private final static int UNINITIALIZED_MAX=2;
     private RandomNumberGenerator generator=null;
+    private final int[][] existing;
     public Grid(RandomNumberGenerator rng,int[][] existing){
-    	int max=0;
-    	for(int i=0;i<existing.length;i++){
-    		for(int j=0;j<existing[i].length;j++){
-    			if(existing[i][j]>max){
-    				max=existing[i][j];
-    			}
-    		}
-    	}
     	int size=existing.length;
-    	this.max=max;
+    	this.existing=existing;
     	generator=rng;
         cells=new ArrayList<>();
         squareSize=size;
@@ -39,12 +32,12 @@ public class Grid{
             setAdjList(cells.get(i),i);
         }
     }
-    public static String newGame(int sideLength,RandomNumberGenerator initializerRng){
+    public static String newGame(int sideLength,InitializerRandomNumberGenerator initializerRng){
     	JsonArray rows=new JsonArray();
     	for(int i=0;i<sideLength;i++){
     		JsonArray cells=new JsonArray();
     		for(int j=0;j<sideLength;j++){
-    			cells.add(initializerRng.next(UNINITIALIZED_MAX));
+    			cells.add(initializerRng.next());
     		}
     		rows.add(cells);
     	}
@@ -63,6 +56,7 @@ public class Grid{
     public String combineOn(int i, int j){
     	JsonObject toStringReturn=new JsonObject();
     	
+    	
     	Deque<Transition> animate=internalBfsOn(i,j);
         TransitionList tList=new TransitionList();
         while(animate.size()>0){
@@ -72,7 +66,7 @@ public class Grid{
         toStringReturn.add("transitionList", tList.toJson());
         JsonArray replaceList=new JsonArray();
         for(int k=0;k<tList.size();k++){
-            replaceList.add(generator.next(max));
+            replaceList.add(generator.next(existing));
         }
         toStringReturn.add("replaceList", replaceList);
     	return toStringReturn.toString();
@@ -86,10 +80,6 @@ public class Grid{
     	return toStringReturn.toString();
     }
     private Deque<Transition> internalBfsOn(int i, int j){
-    	int newVal=cells.get(flattenNdx(i,j)).getValue()+1;
-    	if(newVal>max){
-    		max=newVal;
-    	}
         Queue<Transition> bfsQ=new LinkedList<>();
         Deque<Transition> animate=new ArrayDeque<>();
         CellHolder dontChange=cells.get(flattenNdx(i,j));

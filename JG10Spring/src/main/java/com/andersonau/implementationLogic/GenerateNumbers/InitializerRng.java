@@ -1,10 +1,10 @@
 package com.andersonau.implementationLogic.GenerateNumbers;
 
-public class InitializerRng extends RandomNumberGenerator {
+public class InitializerRng implements InitializerRandomNumberGenerator {
 	
 	int[] odds={1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,3,3,3,4};
 	@Override
-	protected int nextInternal(int max) {
+	public int next() {
         return odds[((int)(Math.random()*100)%(25))];
 	}
 

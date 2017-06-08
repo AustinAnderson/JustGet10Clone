@@ -107,10 +107,20 @@
 }
 .tile{
     transition: transform .15s, opacity .1s;
+    stroke: white;
+    stroke-width:0px;
+    fill:black;
     /*opacity has to be less than transform*/
+}
+text{
+	stroke-width:1px;
+	font-family: 'Tauri', sans-serif;
 }
 .droppingTile{
     transition: transform .5s;
+    stroke: white;
+    stroke-width:0px;
+    fill:black;
 }
 .n1{
     stroke: #38B00B;
@@ -153,3 +163,8 @@
     fill: red;
 }
 .n8 .cellText{fill: orange;}
+.n9{
+    stroke: #D15B32;
+    fill: #FDF536;
+}
+.n9 .cellText{fill: #D15B32;}

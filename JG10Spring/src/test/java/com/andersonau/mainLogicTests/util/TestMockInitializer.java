@@ -17,7 +17,7 @@ public class TestMockInitializer {
 		MockInitializingRng target=new MockInitializingRng(input);
 		int[] actual=new int[9];
 		for(int i=0;i<9;i++){
-			actual[i]=target.next(0);
+			actual[i]=target.next();
 		}
 		assertArrayEquals(new int[]{0,1,2,3,4,5,6,7,8},actual);
 	}
@@ -30,10 +30,10 @@ public class TestMockInitializer {
 		};
 		MockInitializingRng target=new MockInitializingRng(input);
 		for(int i=0;i<9;i++){
-			target.next(0);
+			target.next();
 		}
 		try{
-			target.next(0);
+			target.next();
 			fail("exception was not thrown");
 		}catch(IllegalArgumentException ex){
 			//pass
