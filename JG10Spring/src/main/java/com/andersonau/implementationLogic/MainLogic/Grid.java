@@ -8,6 +8,7 @@ import java.util.ArrayDeque;
 
 import com.andersonau.implementationLogic.GenerateNumbers.InitializerRandomNumberGenerator;
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -70,6 +71,15 @@ public class Grid{
         }
         toStringReturn.add("replaceList", replaceList);
     	return toStringReturn.toString();
+    }
+    public TransitionList combineOnTest(int i, int j){
+    	Deque<Transition> animate=internalBfsOn(i,j);
+        TransitionList tList=new TransitionList();
+        while(animate.size()>0){
+            Transition out=animate.removeLast();
+            tList.addTransition(out);
+        }
+        return tList;
     }
     public String bfsOn(int i,int j){
     	JsonArray toStringReturn=new JsonArray();

@@ -239,7 +239,7 @@ function TileHolder(col,row,number,svg,tileGrid){
 
 function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
 
-    
+    var hasLost=false;
     
     var grid=[];//of arrays of tileholders
     this.debugGetGridDeleteMe=function(){
@@ -253,7 +253,6 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
         grid.push(row);
     }
     this.doAjax=function(row,col){
-    	console.log(""+row+","+col);
     	var that=this;
     	var numberGrid=[];
     	for(i=0;i<grid.length;i++){
@@ -270,6 +269,7 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
         	if(response.transitionList.length!=0&&response.replaceList.length!=0){
         		that.resetWith(response.transitionList,response.replaceList);
         		that.RunTransitions();
+        		hasLost=response.lostGame;
         	}
         },
         dataType:"json",
@@ -285,9 +285,15 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
     var enableAllClickListenersIfDone=function(){
         pendingCallBackCount--;
         if(pendingCallBackCount<=0){
-            for(i=0;i<grid.length;i++){
-                for(j=0;j<grid[i].length;j++){
-                    grid[i][j].enableClickListening();//TODO: implement
+            if(hasLost){
+                var displayContainer=document.getElementById('messageDisplayContainer');
+                displayContainer.style.opacity=1;
+                displayContainer.style.display='inline';
+            }else{
+                for(i=0;i<grid.length;i++){
+                    for(j=0;j<grid[i].length;j++){
+                        grid[i][j].enableClickListening();//TODO: implement
+                    }
                 }
             }
         }
