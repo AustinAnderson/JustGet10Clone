@@ -1,7 +1,5 @@
 package com.andersonau.implementationLogic.GenerateNumbers;
 
-import java.util.LinkedList;
-
 public class MimicOriginalNewTileRNG implements RandomNumberGenerator{
 
 	private static final int[] _1to4Odds=

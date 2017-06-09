@@ -17,7 +17,7 @@ import com.andersonau.implementationLogic.MainLogic.CellHolder;
 
 @RunWith(Parameterized.class)
 public class CellHolderParameterizedConstructorTest {
-
+//need to test adjeceny and has lost stuff
 	@Parameters(name="new CellHolder(row: {0}, col: {1}, initialValue: {2}).toJSON()=={3}")
 	public static Collection<Object[]> data(){
 		Object[][] bob={
@@ -27,17 +27,6 @@ public class CellHolderParameterizedConstructorTest {
 			{-1,1,3,null},
 			{-1,-1,2,null}
 		};
-		for(int i=0;i<bob.length;i++){
-			JSONObject expected=new JSONObject();
-			try {
-				expected.put("row",bob[i][0]);
-				expected.put("col",bob[i][1]);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			bob[i][3]=expected.toString();
-		}
 		return Arrays.asList(bob);
 	}
 	private int row;
@@ -52,10 +41,6 @@ public class CellHolderParameterizedConstructorTest {
 	}
 	
 	
-	@Test
-	public void testToJSON() {
-		assertEquals(expected,new CellHolder(row,col,initialValue).toJson().toString());
-	}
 
 	@Test
 	public void testGetValue(){

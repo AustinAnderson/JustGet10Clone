@@ -3,14 +3,15 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 import java.util.Deque;
+import java.util.HashSet;
 import java.util.ArrayDeque;
 
+import com.andersonau.connections.ServerResponse;
 import com.andersonau.implementationLogic.GenerateNumbers.InitializerRandomNumberGenerator;
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 public class Grid{
     private List<CellHolder> cells;
@@ -54,23 +55,18 @@ public class Grid{
         }
         return lost;
     }
-    public String combineOn(int i, int j){
-    	JsonObject toStringReturn=new JsonObject();
-    	
-    	
+    public ServerResponse combineOn(int i, int j){
     	Deque<Transition> animate=internalBfsOn(i,j);
         TransitionList tList=new TransitionList();
         while(animate.size()>0){
             Transition out=animate.removeLast();
             tList.addTransition(out);
         }
-        toStringReturn.add("transitionList", tList.toJson());
-        JsonArray replaceList=new JsonArray();
+        List<Integer> replacements=new ArrayList<>();
         for(int k=0;k<tList.size();k++){
-            replaceList.add(generator.next(existing));
+            replacements.add(generator.next(existing));
         }
-        toStringReturn.add("replaceList", replaceList);
-    	return toStringReturn.toString();
+    	return new ServerResponse(tList,replacements,hasLost());
     }
     public TransitionList combineOnTest(int i, int j){
     	Deque<Transition> animate=internalBfsOn(i,j);
@@ -81,13 +77,15 @@ public class Grid{
         }
         return tList;
     }
-    public String bfsOn(int i,int j){
-    	JsonArray toStringReturn=new JsonArray();
-    	Deque<Transition> animate=internalBfsOn(i,j);
-    	while(animate.size()>0){
-    		toStringReturn.add(animate.remove().to.toJson());
+    public Set<CellHolder> bfsOn(int i,int j){
+    	Set<CellHolder> affectedTiles=new HashSet<>();
+    	Deque<Transition> results=internalBfsOn(i,j);
+    	for(int k=0;k<results.size();k++){
+    		Transition result=results.pop();
+    		affectedTiles.add(result.fromNdxs);
+    		affectedTiles.add(result.toNdxs);
     	}
-    	return toStringReturn.toString();
+    	return affectedTiles;
     }
     private Deque<Transition> internalBfsOn(int i, int j){
         Queue<Transition> bfsQ=new LinkedList<>();
@@ -95,19 +93,19 @@ public class Grid{
         CellHolder dontChange=cells.get(flattenNdx(i,j));
         bfsQ.add(new Transition(dontChange,dontChange));
         CellHolder topNeighbor=null;
-        while(bfsQ.peek()!=null&&bfsQ.peek().from!=null){
+        while(bfsQ.peek()!=null&&bfsQ.peek().fromNdxs!=null){
             if(topNeighbor!=null&&!topNeighbor.beenVisited()&&
-                    bfsQ.peek().from.getValue()==topNeighbor.getValue()&&
-                    !bfsQ.peek().from.beenVisited()){
+                    bfsQ.peek().fromNdxs.getValue()==topNeighbor.getValue()&&
+                    !bfsQ.peek().fromNdxs.beenVisited()){
                 if(!topNeighbor.equals(dontChange)&&topNeighbor.getValue()!=0){
-                    bfsQ.add(new Transition(topNeighbor,bfsQ.peek().from));
+                    bfsQ.add(new Transition(topNeighbor,bfsQ.peek().fromNdxs));
                 }
             }
-            topNeighbor=bfsQ.peek().from.nextCellHolder();
+            topNeighbor=bfsQ.peek().fromNdxs.nextCellHolder();
             if(topNeighbor==null){
                 Transition removed=bfsQ.remove();
-                removed.from.setVisited();
-                if(!removed.from.equals(dontChange)){
+                removed.fromNdxs.setVisited();
+                if(!removed.fromNdxs.equals(dontChange)){
                     animate.addLast(removed);
                 }
             }

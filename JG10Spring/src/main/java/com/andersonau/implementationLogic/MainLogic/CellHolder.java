@@ -1,11 +1,7 @@
 package com.andersonau.implementationLogic.MainLogic;
 import java.util.List;
 
-import org.json.JSONObject;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
@@ -44,12 +40,6 @@ public class CellHolder{
     	return row;
     }
 
-    public JsonObject toJson(){
-        JsonObject toReturn=new JsonObject();
-		toReturn.addProperty("row", row);
-		toReturn.addProperty("col", col);
-        return toReturn;
-    }
     public int getValue(){
         return cell.getValue();
     }
@@ -74,7 +64,7 @@ public class CellHolder{
     }
     @Override
     public String toString(){
-    	return "{\"row\":"+row+",\"col\":"+col+"}";
+    	return "(r:"+row+",c:"+col+"): "+getValue();
     }
 }
 /*

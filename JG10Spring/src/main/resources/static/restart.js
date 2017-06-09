@@ -266,8 +266,8 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
         url: "/moveOn/"+row+"/"+col,
         data: JSON.stringify(numberGrid),
         success: function(response){
-        	if(response.transitionList.length!=0&&response.replaceList.length!=0){
-        		that.resetWith(response.transitionList,response.replaceList);
+        	if(response.transitionList.transitionList.length!=0&&response.replaceList.length!=0){
+        		that.resetWith(response.transitionList.transitionList,response.replaceList);
         		that.RunTransitions();
         		hasLost=response.lostGame;
         	}

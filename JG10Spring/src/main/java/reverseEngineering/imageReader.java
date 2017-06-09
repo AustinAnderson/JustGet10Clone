@@ -7,61 +7,20 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 import javax.imageio.ImageIO;
-class BfsPoint{
-	public int row;
-	public int col;
-	private final static int UP=0;
-	private final static int DOWN=1;
-	private final static int LEFT=2;
-	private final static int RIGHT=3;
-	private final static int DONE=4;
-	private int state=UP;
-	private boolean[][] sharedVisitedMat=null;
-	public BfsPoint(int r,int c,boolean[][] visitedMat){
-		row=r;
-		col=c;
-		sharedVisitedMat=visitedMat;
-	}
-	public boolean isNextValid(int[][] grid,int nextRow,int nextCol){
-		return nextRow>=0&&nextRow<grid.length&&
-		       nextCol>=0&&nextCol<grid[nextRow].length&&
-		       !sharedVisitedMat[nextRow][nextCol]&&
-		       grid[row][col]==grid[nextRow][nextCol];
-	}
-	public BfsPoint next(int[][] grid){
-		BfsPoint toReturn=null;
-		int modR=0;
-		int modC=0;
-		while(state<DONE&&toReturn==null){
-                 if(state==UP)   {modR=-1;modC= 0;}
-            else if(state==DOWN) {modR= 1;modC= 0;}
-            else if(state==LEFT) {modR= 0;modC=-1;}
-            else if(state==RIGHT){modR= 0;modC= 1;}
-            if(isNextValid(grid,row+modR,col+modC)){
-                sharedVisitedMat[row+modR][col+modC]=true;
-                toReturn=new BfsPoint(row+modR,col+modC,sharedVisitedMat);
-            }
-            state++;
-		}
-		return toReturn;
-	}
-	@Override
-	public String toString(){
-		return "(r:"+row+",c:"+col+")";
-	}
-}
+
+import com.andersonau.implementationLogic.MainLogic.BfsPoint;
 public class imageReader {
 	//public static Map<Integer,Integer> colorMap=new HashMap<>();
+	@SuppressWarnings("serial")
 	public static Map<Integer,Integer> colorMap=new HashMap<Integer,Integer>(){
 		{
 			put(-1007536,3); put(-1028016,4); put(-6230016,1); put(-11493136,2); put(-6230016,1); 
@@ -149,21 +108,6 @@ public class imageReader {
 		}
 		return max;
 	}
-	public static ArrayList<BfsPoint> bfs(int[][] values,int row, int col){
-		boolean[][] visiteds=new boolean[values.length][values[0].length];//booleans init to false
-		visiteds[row][col]=true;
-		int ndx=0;
-		ArrayList<BfsPoint> visitedPoints=new ArrayList<>();
-		visitedPoints.add(new BfsPoint(row,col,visiteds));
-		BfsPoint next=null;
-		while(ndx<visitedPoints.size()){
-			while((next=visitedPoints.get(ndx).next(values))!=null){
-				visitedPoints.add(next);
-			};
-			ndx++;
-		}
-		return visitedPoints;
-	}
 	public static String getReplacedTileList(int[][] before,int[][] after, int rowCombinedOn,int colCombinedOn){
 		StringBuilder builder=new StringBuilder();
 		int values[]=aggregate(before);
@@ -172,7 +116,7 @@ public class imageReader {
 			builder.append(i+":"+values[i]+", ");
 		}
 		builder.append("]  ");
-		ArrayList<BfsPoint> matching=bfs(before,rowCombinedOn,colCombinedOn);
+		List<BfsPoint> matching=BfsPoint.runBfs(rowCombinedOn,colCombinedOn,before);
 		int[] tilesPerCol=new int[5];
 		for(int i=0;i<matching.size();i++){
 			tilesPerCol[matching.get(i).col]++;
@@ -195,8 +139,8 @@ public class imageReader {
 	};
 	public static void initMap(Robot r,Scanner s){//pullUp colorKey screenshot
 		
-		Rectangle screen=new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
-		BufferedImage img=r.createScreenCapture(screen);
+		///Rectangle screen=new Rectangle(Toolkit.getDefaultToolkit().getScreenSize());
+		//BufferedImage img=r.createScreenCapture(screen);
 		for(int i=0;i<5;i++){
 			for(int j=0;j<5;j++){
 				r.mouseMove(startX+step*j, startY+step*i);
