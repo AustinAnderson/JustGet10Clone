@@ -6,8 +6,6 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -18,36 +16,55 @@ import com.andersonau.implementationLogic.MainLogic.CellHolder;
 @RunWith(Parameterized.class)
 public class CellHolderParameterizedConstructorTest {
 //need to test adjeceny and has lost stuff
-	@Parameters(name="new CellHolder(row: {0}, col: {1}, initialValue: {2}).toJSON()=={3}")
+	@Parameters(name="CellHolder(r: {0}, c: {1}, initialValue: {2})")
 	public static Collection<Object[]> data(){
-		Object[][] bob={
-			{0,0,2,null},
-			{1,1,0,null},
-			{1,-1,-1,null},
-			{-1,1,3,null},
-			{-1,-1,2,null}
+		Object[][] data={
+			{0,0,2},
+			{1,1,0},
+			{1,-1,-1},
+			{-1,1,3},
+			{-1,-1,2}
 		};
-		return Arrays.asList(bob);
+		return Arrays.asList(data);
 	}
 	private int row;
 	private int col;
 	private int initialValue;
-	private String expected;
-	public CellHolderParameterizedConstructorTest(int i1,int i2,int i3,String expected){
-		row=i1;
-		col=i2;
-		initialValue=i3;
-		this.expected=expected;
+	public CellHolderParameterizedConstructorTest(int row,int col,int initialValue){
+		this.row=row;
+		this.col=col;
+		this.initialValue=initialValue;
 	}
 	
 	
+	@Test
+	public void isEqualTest(){
+		CellHolder target1=new CellHolder(row,col,initialValue);
+		CellHolder target2=new CellHolder(row,col,initialValue+1);
+		assertTrue("cellHolders "+target1+" and "+target2+" should be equal",target1.equals(target2));
+		assertTrue("cellHolders "+target2+" and "+target1+" should be equal",target2.equals(target1));
+	}
+	@Test
+	public void NotEqualByRowTest(){
+		CellHolder target1=new CellHolder(row,col,initialValue);
+		CellHolder target2=new CellHolder(row+1,col,initialValue);
+		assertFalse("cellHolders "+target1+" and "+target2+" should not be equal",target1.equals(target2));
+		assertFalse("cellHolders "+target2+" and "+target1+" should not be equal",target2.equals(target1));
+	}
+	@Test
+	public void NotEqualByColTest(){
+		CellHolder target1=new CellHolder(row,col,initialValue);
+		CellHolder target2=new CellHolder(row,col+1,initialValue);
+		assertFalse("cellHolders "+target1+" and "+target2+" should not be equal",target1.equals(target2));
+		assertFalse("cellHolders "+target2+" and "+target1+" should not be equal",target2.equals(target1));
+	}
 
 	@Test
-	public void testGetValue(){
+	public void getValueTest(){
 		assertEquals(initialValue,new CellHolder(row,col,initialValue).getValue());
 	}
 	@Test
-	public void visited(){
+	public void visitedTest(){
 		CellHolder target=new CellHolder(row,col,initialValue);
 		assertFalse("expected visited to be false on instantiation", target.beenVisited());
 	}

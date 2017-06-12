@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Set;
 
+import com.andersonau.implementationLogic.MainLogic.CellHolder;
+
 public class AssertUtils{
 
 	public static <T> void assertNestedListsEqual(List<? extends List<T>> expected,List<? extends List<T>> actual){
@@ -16,7 +18,9 @@ public class AssertUtils{
 		for(int i=0;i<expected.size();i++){
 			assertEquals(message+"\n"+"lengths of lists["+i+"] are not equal", expected.get(i).size(), actual.get(i).size());
 			for(int j=0;j<expected.get(i).size();j++){
-				assertEquals(message+"\n"+"for element List["+i+"]["+j+"],",expected.get(i).get(j),actual.get(i).get(j));
+				T expectedEl=expected.get(i).get(j);
+				T actualEl=actual.get(i).get(j);
+				assertEquals(message+"\n"+"for element List["+i+"]["+j+"],",expectedEl,actualEl);
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-package com.andersonau.mainLogicTests;
+package com.andersonau.mainLogicTests.util;
 
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
 

@@ -17,6 +17,7 @@ import com.andersonau.implementationLogic.MainLogic.CellHolder;
 import com.andersonau.implementationLogic.MainLogic.Grid;
 import com.andersonau.implementationLogic.MainLogic.Transition;
 import com.andersonau.mainLogicTests.util.AssertUtils;
+import com.andersonau.mainLogicTests.util.MockReplacementRng;
 
 @SuppressWarnings("serial")//not serializing
 @RunWith(Parameterized.class)
@@ -45,7 +46,7 @@ public class TestGrid {
 			{0,2,loseSaveByReplaceTile,3,false,null,new int[]{3},"lose by replace tile"},
 			{0,2,loseSaveByReplaceTile,5,true,null,new int[]{5},"saved by replace tile"},
 		};
-		paramData[CantCombineAfter][INPUT_GRID]=new int[][]{//combine on 4,3
+		paramData[CanCombineAfter][INPUT_GRID]=new int[][]{//combine on 4,3
             {1,2,2,1,1},//1,3,3,3,3
             {1,1,2,1,1},//1,1,3,1,1
             {1,1,2,4,1},//1,1,3,1,1
@@ -55,42 +56,42 @@ public class TestGrid {
 		paramData[CanCombineAfter][EXPECTED_TRANSITIONS]=new ArrayList<ArrayList<Transition>>(){{
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(0, 1, 1),
-                    new CellHolder(0, 2, 1)
+                    new CellHolder(0, 1, 2),
+                    new CellHolder(0, 2, 2)
                 ));
             }});
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(0,2,1),
-                    new CellHolder(1,2,1)
+                    new CellHolder(0,2,2),
+                    new CellHolder(1,2,2)
                 ));
             }});
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(1,2,1),
-                    new CellHolder(2,2,1)
+                    new CellHolder(1,2,2),
+                    new CellHolder(2,2,2)
                 ));
             }});
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(2,2,1),
-                    new CellHolder(3,2,1)
+                    new CellHolder(2,2,2),
+                    new CellHolder(3,2,2)
                 ));
             }});
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(3,4,1),
-                    new CellHolder(3,3,1)
+                    new CellHolder(3,4,2),
+                    new CellHolder(3,3,2)
                 ));
                 add(new Transition(
-                    new CellHolder(3,2,1),
-                    new CellHolder(3,3,1)
+                    new CellHolder(3,2,2),
+                    new CellHolder(3,3,2)
                 ));
             }});
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(3,3,1),
-                    new CellHolder(4,3,1)
+                    new CellHolder(3,3,2),
+                    new CellHolder(4,3,2)
                 ));
             }});
         }};
@@ -106,8 +107,8 @@ public class TestGrid {
         paramData[CantCombineAfter][EXPECTED_TRANSITIONS]=new ArrayList<ArrayList<Transition>>(){{
             add(new ArrayList<Transition>(){{
                 add(new Transition(
-                    new CellHolder(2,2,1),
-                    new CellHolder(3,2,1)
+                    new CellHolder(2,2,2),
+                    new CellHolder(3,2,2)
                 ));
             }});
         }};
@@ -164,12 +165,6 @@ public class TestGrid {
 		this.expectedReplaceList=expectedReplaceList;
 		expectedCombinable=expectedCanCombine;
 	}
-	/*
-	@Test
-	public void testNewGrid(){
-		testBFS(expected,Grid.newGame(5, new MockInitializingRng(grid),new MockReplacementRng(replaceNum)));
-	}
-	*/
 	@Test
 	public void testExistingGrid(){
 		ServerResponse response=new Grid(new MockReplacementRng(replaceNum),grid).combineOn(row, col);

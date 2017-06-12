@@ -66,6 +66,21 @@ public class CellHolder{
     public String toString(){
     	return "(r:"+row+",c:"+col+"): "+getValue();
     }
+    @Override
+    public int hashCode(){
+    	return row^col;
+    }
+    @Override 
+    public boolean equals(Object other){
+    	boolean toReturn=false;
+    	if(other instanceof CellHolder){
+    		CellHolder casted=(CellHolder)other;
+    		if(casted.row==row&&casted.col==col){
+    			toReturn=true;
+    		}
+    	}
+    	return toReturn;
+    }
 }
 /*
 if((x-n)>=0){
