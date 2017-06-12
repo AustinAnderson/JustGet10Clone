@@ -119,7 +119,7 @@ public class imageReader {
 		List<BfsPoint> matching=BfsPoint.runBfs(rowCombinedOn,colCombinedOn,before);
 		int[] tilesPerCol=new int[5];
 		for(int i=0;i<matching.size();i++){
-			tilesPerCol[matching.get(i).col]++;
+			tilesPerCol[matching.get(i).getCol()]++;
 		}
 		for(int col=0;col<after[0].length;col++){
 			for(int row=0;row<after.length;row++){

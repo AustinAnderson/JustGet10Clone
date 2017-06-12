@@ -9,20 +9,37 @@ import java.util.ArrayList;
 public class CellHolder{
     private List<CellHolder> adjList=new ArrayList<>();
     private int next=0;
-    private Cell cell=null;
+    private int cell;
     private boolean visited=false;
     private final int row;
     private final int col;
+    public final static int EMPTY=-1;
+    public final static int MINIMUM_VALUE=0;
 
     public CellHolder(int y,int x,int initialValue){
+    	if(initialValue<MINIMUM_VALUE) initialValue=MINIMUM_VALUE;
     	this.row=y;
     	this.col=x;
-        cell=new Cell(initialValue);
+        cell=initialValue;
     }
 
+    public void shiftCellToMe(CellHolder other){
+    	this.cell=other.cell;
+    	other.cell=EMPTY;
+    }
+    public void replaceCell(int value){
+    	if(cell==EMPTY){
+    		cell=value;
+    	}
+    }
+    public void increment(){
+    	cell++;
+    }
     public boolean canCombine(){
         boolean equalNeighbor=false;
         
+        int nextNextNdx=this.next;
+        this.next=0;
         CellHolder next=nextCellHolder();
         while(next!=null){
             if(next.getValue()==getValue()){
@@ -30,6 +47,7 @@ public class CellHolder{
             }
             next=nextCellHolder();
         }
+        this.next=nextNextNdx;
         return equalNeighbor;
     }
 
@@ -41,7 +59,7 @@ public class CellHolder{
     }
 
     public int getValue(){
-        return cell.getValue();
+        return cell;
     }
     public void addAdjacentCellHolder(CellHolder toAdd){
         adjList.add(toAdd);
@@ -68,7 +86,7 @@ public class CellHolder{
     }
     @Override
     public int hashCode(){
-    	return row^col;
+    	return row<<1+row+col;
     }
     @Override 
     public boolean equals(Object other){

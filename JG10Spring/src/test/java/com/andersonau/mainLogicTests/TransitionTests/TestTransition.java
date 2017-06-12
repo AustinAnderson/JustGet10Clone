@@ -21,7 +21,7 @@ public class TestTransition {
 		CellHolder[] cells={
             new CellHolder(0,0,1),
             new CellHolder(0,1,2),
-            new CellHolder(0,0,-1),
+            new CellHolder(0,1,-1),
             new CellHolder(1,1,-1)
 		};
 		return Arrays.asList(new Object[][]{

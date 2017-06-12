@@ -20,7 +20,7 @@ public class RestControllers{
 		return new Grid(new MimicOriginalNewTileRNG(),gridData).combineOn(row, col);
 	}
 	
-	//for if I want to have a call for highlighting and then another for actual combiniation
+	//for if I want to have a call for highlighting and then another for actual combination
 	@RequestMapping(value="/bfsOn/{row}/{col}", method=RequestMethod.POST)
 	public Iterable<BfsPoint> bfsOn(@PathVariable int row,@PathVariable int col, @RequestBody int[][] gridData){
 		return BfsPoint.runBfs(row, col, gridData);//simple int bfs

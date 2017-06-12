@@ -1,14 +1,12 @@
 package com.andersonau.connections;
 
-import java.util.List;
-
 import com.andersonau.implementationLogic.MainLogic.TransitionList;
 
 public class ServerResponse {
 	private final TransitionList transitionList;
-	private final List<Integer> replaceList;
+	private final int[] replaceList;
 	private final boolean hasLost;
-	public ServerResponse(TransitionList transitionList, List<Integer> replaceList,boolean lost){
+	public ServerResponse(TransitionList transitionList, int[] replaceList,boolean lost){
 		this.transitionList=transitionList;
 		this.replaceList=replaceList;
 		hasLost=lost;
@@ -16,7 +14,7 @@ public class ServerResponse {
 	public TransitionList getTransitionList(){
 		return transitionList; 
 	}
-	public List<Integer> getReplaceList(){
+	public int[] getReplaceList(){
 		return replaceList;
 	}
 	public boolean getHasLost(){

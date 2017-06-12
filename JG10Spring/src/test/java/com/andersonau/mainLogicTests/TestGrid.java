@@ -150,28 +150,27 @@ public class TestGrid {
 	private final ArrayList<ArrayList<Transition>> expected;
 	private final int[] expectedReplaceList;
 	private final boolean expectedCombinable;
-	private final int[][] grid;
-	private final int replaceNum;
-	private final int row;
-	private final int col;
+	private final ServerResponse response;
 	
 	public TestGrid(int row,int col,int[][] grid, int replaceNum, boolean expectedCanCombine,
 			ArrayList<ArrayList<Transition>> expected,int[] expectedReplaceList,String name){
 		this.expected=expected;
-		this.grid=grid;
-		this.replaceNum=replaceNum;
-		this.row=row;
-		this.col=col;
 		this.expectedReplaceList=expectedReplaceList;
 		expectedCombinable=expectedCanCombine;
+		response=new Grid(new MockReplacementRng(replaceNum),grid).combineOn(row, col);
 	}
 	@Test
-	public void testExistingGrid(){
-		ServerResponse response=new Grid(new MockReplacementRng(replaceNum),grid).combineOn(row, col);
-		assertArrayEquals("testing ReplaceList, ",expectedReplaceList,response.getReplaceList().stream().mapToInt(i->i).toArray());
+	public void replaceListTest(){
+		assertArrayEquals("testing ReplaceList, ",expectedReplaceList,response.getReplaceList());
+	}
+	@Test
+	public void transitionsListTest(){
 		if(expected!=null){
 			AssertUtils.assertNestedListsEqual("testing transitionsList, ",expected,response.getTransitionList().getTransitionList());
 		}
+	}
+	@Test
+	public void canCombineTest(){
 		assertEquals("testing if grid can combine after done\n",expectedCombinable,!response.getHasLost());
 	}
 }

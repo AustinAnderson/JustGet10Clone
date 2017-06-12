@@ -27,13 +27,19 @@ public class CellHolderParameterizedConstructorTest {
 		};
 		return Arrays.asList(data);
 	}
-	private int row;
-	private int col;
-	private int initialValue;
+	private final int row;
+	private final int col;
+	private final int initialValue;
+	private final int expectedValue;
 	public CellHolderParameterizedConstructorTest(int row,int col,int initialValue){
 		this.row=row;
 		this.col=col;
 		this.initialValue=initialValue;
+		int expected=initialValue;
+		if(initialValue<CellHolder.MINIMUM_VALUE){
+			expected=CellHolder.MINIMUM_VALUE;
+		}
+		this.expectedValue=expected;
 	}
 	
 	
@@ -61,7 +67,7 @@ public class CellHolderParameterizedConstructorTest {
 
 	@Test
 	public void getValueTest(){
-		assertEquals(initialValue,new CellHolder(row,col,initialValue).getValue());
+		assertEquals(expectedValue,new CellHolder(row,col,initialValue).getValue());
 	}
 	@Test
 	public void visitedTest(){

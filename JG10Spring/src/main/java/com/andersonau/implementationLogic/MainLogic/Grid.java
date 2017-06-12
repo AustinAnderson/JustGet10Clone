@@ -1,96 +1,61 @@
 package com.andersonau.implementationLogic.MainLogic;
-import java.util.List;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.Set;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.ArrayDeque;
 
 import com.andersonau.connections.ServerResponse;
 import com.andersonau.implementationLogic.GenerateNumbers.InitializerRandomNumberGenerator;
 import com.andersonau.implementationLogic.GenerateNumbers.RandomNumberGenerator;
-import com.google.gson.JsonArray;
 
 public class Grid{
-    private List<CellHolder> cells;
-    private int squareSize;
+    private final CellHolder[][] cells;
+    private final int squareSize;
     private RandomNumberGenerator generator=null;
     private final int[][] existing;
     public Grid(RandomNumberGenerator rng,int[][] existing){
     	int size=existing.length;
     	this.existing=existing;
     	generator=rng;
-        cells=new ArrayList<>();
         squareSize=size;
+        cells=new CellHolder[squareSize][];
         for(int i=0;i<squareSize;i++){
+        	cells[i]=new CellHolder[squareSize];
         	for(int j=0;j<squareSize;j++){
         		int toAdd=existing[i][j];
-        		cells.add(new CellHolder(i,j,toAdd));
+        		cells[i][j]=new CellHolder(i,j,toAdd);
         	}
         }
-        for(int i=0;i<squareSize*squareSize;i++){
-            setAdjList(cells.get(i),i);
+        for(int i=0;i<squareSize;i++){
+        	for(int j=0;j<squareSize;j++){
+        		setAdjList(cells[i][j],i,j);
+        	}
         }
     }
-    public static String newGame(int sideLength,InitializerRandomNumberGenerator initializerRng){
-    	JsonArray rows=new JsonArray();
-    	for(int i=0;i<sideLength;i++){
-    		JsonArray cells=new JsonArray();
-    		for(int j=0;j<sideLength;j++){
-    			cells.add(initializerRng.next());
+    public static int[][] newGame(int sideLength,InitializerRandomNumberGenerator initializerRng){
+    	int[][] newGameGrid=new int[sideLength][];
+    	for(int i=0;i<newGameGrid.length;i++){
+    		newGameGrid[i]=new int[sideLength];
+    		for(int j=0;j<newGameGrid[i].length;j++){
+    			newGameGrid[i][j]=initializerRng.next();
     		}
-    		rows.add(cells);
     	}
-    	return rows.toString();
+    	return newGameGrid;
     }
-
-    public boolean hasLost(){//need to test this
-        boolean lost=true;
-        for(CellHolder currentHolder: cells){
-            if(currentHolder.canCombine()){
-                lost=false;
-            }
-        }
-        return lost;
-    }
+    
     public ServerResponse combineOn(int i, int j){
-    	Deque<Transition> animate=internalBfsOn(i,j);
-        TransitionList tList=new TransitionList();
-        while(animate.size()>0){
-            Transition out=animate.removeLast();
-            tList.addTransition(out);
+    	TransitionList transitionList=internalBfsOn(i,j);
+        int[] replacements=new int[transitionList.size()];
+        for(int k=transitionList.size()-1;k>=0;k--){
+            replacements[k]=generator.next(existing);
         }
-        List<Integer> replacements=new ArrayList<>();
-        for(int k=0;k<tList.size();k++){
-            replacements.add(generator.next(existing));
-        }
-    	return new ServerResponse(tList,replacements,hasLost());
+        collapseAndRefill(replacements);
+    	return new ServerResponse(transitionList,replacements,hasLost());
     }
-    public TransitionList combineOnTest(int i, int j){
-    	Deque<Transition> animate=internalBfsOn(i,j);
-        TransitionList tList=new TransitionList();
-        while(animate.size()>0){
-            Transition out=animate.removeLast();
-            tList.addTransition(out);
-        }
-        return tList;
-    }
-    public Set<CellHolder> bfsOn(int i,int j){
-    	Set<CellHolder> affectedTiles=new HashSet<>();
-    	Deque<Transition> results=internalBfsOn(i,j);
-    	for(int k=0;k<results.size();k++){
-    		Transition result=results.pop();
-    		affectedTiles.add(result.fromNdxs);
-    		affectedTiles.add(result.toNdxs);
-    	}
-    	return affectedTiles;
-    }
-    private Deque<Transition> internalBfsOn(int i, int j){
+    private TransitionList internalBfsOn(int i, int j){
         Queue<Transition> bfsQ=new LinkedList<>();
         Deque<Transition> animate=new ArrayDeque<>();
-        CellHolder dontChange=cells.get(flattenNdx(i,j));
+        CellHolder dontChange=cells[i][j];
         bfsQ.add(new Transition(dontChange,dontChange));
         CellHolder topNeighbor=null;
         while(bfsQ.peek()!=null&&bfsQ.peek().fromNdxs!=null){
@@ -110,31 +75,61 @@ public class Grid{
                 }
             }
         }
-
-        return animate;
+        TransitionList tList=new TransitionList();
+        while(animate.size()>0){
+            Transition out=animate.removeLast();
+            tList.addTransitionAndExecute(out);
+        }
+    	return tList;
+    }
+    private boolean hasLost(){
+        boolean lost=true;
+        for(int i=0;i<cells.length;i++){
+        	for(int j=0;j<cells[i].length;j++){
+        		if(cells[i][j].canCombine()){
+        			lost=false;
+        		}
+        	}
+        }
+        return lost;
+    }
+    private void collapseAndRefill(int[] replacements){
+    	int replaceNdx=replacements.length-1;
+    	for(int j=squareSize-1;j>=0;j--){
+    		for(int i=squareSize-1;i>=0;i--){
+    			if(cells[i][j].getValue()==CellHolder.EMPTY){
+    				int rowNum=i-1;
+    				while(rowNum>=0&&cells[i][j].getValue()==CellHolder.EMPTY){
+    					rowNum--;
+    				}
+    				if(rowNum>=0){
+    					cells[i][j].shiftCellToMe(cells[rowNum][j]);
+    				}else{
+    					if(replaceNdx<0){
+    						replaceNdx=0;
+    						//logError
+    						System.err.println("replaceList length doesnt match number of empty tiles!!!");
+    					}
+    					cells[i][j].replaceCell(replacements[replaceNdx]);
+    					replaceNdx--;
+    				}
+    			}
+    		}
+    	}
     }
 
-    private void setAdjList(CellHolder toSet,int index){
-        if((index-squareSize)>=0){
-            toSet.addAdjacentCellHolder(cells.get(index-squareSize));
+    private void setAdjList(CellHolder toSet,int row,int col){
+        if((row-1)>=0){
+            toSet.addAdjacentCellHolder(cells[row-1][col]);
         }
-        if(index%squareSize!=0){
-            toSet.addAdjacentCellHolder(cells.get(index-1));
+        if((col-1)>=0){
+            toSet.addAdjacentCellHolder(cells[row][col-1]);
         }
-        if((index+1)%squareSize!=0){
-            toSet.addAdjacentCellHolder(cells.get(index+1));
+        if((col+1)<cells[0].length){
+            toSet.addAdjacentCellHolder(cells[row][col+1]);
         }
-        if((index+squareSize)<(squareSize*squareSize)){
-            toSet.addAdjacentCellHolder(cells.get(index+squareSize));
+        if((row+1)<cells.length){
+            toSet.addAdjacentCellHolder(cells[row+1][col]);
         }
-    }
-    //for a
-    //0 1 2 3 
-    //4 5 6 7 
-    //8 9 A B
-    //C D E F
-    //a[2][3]=>a[11]
-    private int flattenNdx(int i,int j){
-        return i*squareSize+j;
     }
 }

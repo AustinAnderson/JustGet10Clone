@@ -14,11 +14,12 @@ public class Transition{
     }
     @Override
     public String toString(){
-    	return "%"+toNdxs+"%->%"+fromNdxs+"%";
+    	return "%"+fromNdxs+"%->%"+toNdxs+"%";
     }
     @Override
     public int hashCode(){
-    	return toNdxs.hashCode()^fromNdxs.hashCode();
+    	int toHash=toNdxs.hashCode();
+    	return toHash<<1+toHash+fromNdxs.hashCode();
     }
     @Override
     public boolean equals(Object other){

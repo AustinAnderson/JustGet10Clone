@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Set;
 
-import com.andersonau.implementationLogic.MainLogic.CellHolder;
 
 public class AssertUtils{
 

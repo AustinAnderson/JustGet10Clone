@@ -17,16 +17,16 @@ import com.andersonau.implementationLogic.MainLogic.CellHolder;
 @RunWith(Parameterized.class)
 public class CellHolderParameterizedAdjListTest{
 
-	private final static int val=1;
+	private final static int combineOnVal=1;
 	@Parameters(name="{0};  {1};  {2};  {3}")
 	public static Collection<Object[]> data(){
 		return Arrays.asList(new Object[][]{
-			{new CellHolder(0,-1,val),new CellHolder(-1,0,val),new CellHolder(0,1,val),new CellHolder(1,0,val),true},
-			{new CellHolder(0,-1,val),null,new CellHolder(0,1,val),null,true},
+			{new CellHolder(0,-1,combineOnVal),new CellHolder(-1,0,combineOnVal),new CellHolder(0,1,combineOnVal),new CellHolder(1,0,combineOnVal),true},
+			{new CellHolder(0,-1,combineOnVal),null,new CellHolder(0,1,combineOnVal),null,true},
 			{new CellHolder(0,-1,4),new CellHolder(-1,0,2),new CellHolder(0,1,8),new CellHolder(1,0,3),false},
 			{null,null,null,null,false},
-			{new CellHolder(0,-1,0),new CellHolder(-1,0,4),new CellHolder(0,1,val),null,true},
-			{new CellHolder(0,-1,8),new CellHolder(-1,0,9),null,new CellHolder(1,0,val),true}
+			{new CellHolder(0,-1,0),new CellHolder(-1,0,4),new CellHolder(0,1,combineOnVal),null,true},
+			{new CellHolder(0,-1,8),new CellHolder(-1,0,9),null,new CellHolder(1,0,combineOnVal),true}
 		});
 	}
 	private CellHolder target;
@@ -34,7 +34,7 @@ public class CellHolderParameterizedAdjListTest{
 	private boolean expectedCombinable;
 	public CellHolderParameterizedAdjListTest(CellHolder left,CellHolder right, CellHolder up, CellHolder down,boolean combinable){
 		expectedCombinable=combinable;
-		target=new CellHolder(0,0,val);
+		target=new CellHolder(0,0,combineOnVal);
 		if(up!=null){
 			target.addAdjacentCellHolder(up);
 			expectedNextSequence.add(up);
@@ -61,6 +61,11 @@ public class CellHolderParameterizedAdjListTest{
 	@Test
 	public void canCombine(){
 		assertEquals(expectedCombinable,target.canCombine());
+	}
+	@Test
+	public void canCombineWorksTwice(){
+		assertEquals("first run: ",expectedCombinable,target.canCombine());
+		assertEquals("second run: ",expectedCombinable,target.canCombine());
 	}
 	
 	

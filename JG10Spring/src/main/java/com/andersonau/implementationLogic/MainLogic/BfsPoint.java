@@ -4,10 +4,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class BfsPoint {
-	public int row;
-	public int getRow(){return row;}//for serialization
-	public int col;
-	public int getCol(){return col;}//for serialization
+	private int row;
+	public int getRow(){
+		return row;
+	}
+	private int col;
+	public int getCol(){
+		return col;
+	}
 	
 	private final static int UP=0;
 	private final static int DOWN=1;
@@ -21,13 +25,13 @@ public class BfsPoint {
 		col=c;
 		sharedVisitedMat=visitedMat;
 	}
-	public boolean isNextValid(int[][] grid,int nextRow,int nextCol){
+	private boolean isNextValid(int[][] grid,int nextRow,int nextCol){
 		return nextRow>=0&&nextRow<grid.length&&
 		       nextCol>=0&&nextCol<grid[nextRow].length&&
 		       !sharedVisitedMat[nextRow][nextCol]&&
 		       grid[row][col]==grid[nextRow][nextCol];
 	}
-	public BfsPoint next(int[][] grid){
+	private BfsPoint next(int[][] grid){
 		BfsPoint toReturn=null;
 		int modR=0;
 		int modC=0;

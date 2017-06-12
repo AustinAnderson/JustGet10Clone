@@ -237,7 +237,7 @@ function TileHolder(col,row,number,svg,tileGrid){
     }
 }
 
-function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
+function TileGrid(rows,cols,svg,numbers){
 
     var hasLost=false;
     
@@ -292,7 +292,7 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
             }else{
                 for(i=0;i<grid.length;i++){
                     for(j=0;j<grid[i].length;j++){
-                        grid[i][j].enableClickListening();//TODO: implement
+                        grid[i][j].enableClickListening();
                     }
                 }
             }
@@ -379,7 +379,7 @@ function TileGrid(rows,cols,svg,numbers){//TODO: make singleton
 
         for(i=0;i<grid.length;i++){
             for(j=0;j<grid[i].length;j++){
-                grid[i][j].disableClickListening();//TODO: implement
+                grid[i][j].disableClickListening();
             }
         }
     }
