@@ -1,6 +1,21 @@
 <html>
 	<head>
 
+		<script>
+			var isIE=false;
+			(function() {
+				var ua = window.navigator.userAgent,
+					msie = ua.indexOf('MSIE'),
+					trident = ua.indexOf('Trident/');
+				if((msie > -1 || trident > -1)){
+					isIE=true;
+				}
+			})();
+
+			if (isIE) {
+				window.location.replace("/getABetterBrowser");
+			}
+		</script>
 		<link rel="stylesheet" type="text/css" id="styles" href="../css/style.css"/>
 		<link href="https://fonts.googleapis.com/css?family=Tauri" rel="stylesheet"/>
 		<!--<script type="text/javascript" src="../js/run.js"></script>-->
@@ -19,13 +34,12 @@
 							<div id="highScoreText" >
 								High Score
 							</div>
-							<svg id="highScoreSquare" height="50px" width="50px">
-								<rect height="50px" width="50px"/>
+							<svg id="highScoreSquare">
 							</svg>
 						</div>
 					</div>
 					<div id="innerButtons">
-						<button id="restartInner">Play Again</button>
+						<button id="restartInner" onclick="location.reload();">Play Again</button>
 					</div>
 				</div>
 			</div>

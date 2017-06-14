@@ -46,10 +46,14 @@ public class Grid{
     public ServerResponse combineOn(int i, int j){
     	TransitionList transitionList=internalBfsOn(i,j);
         int[] replacements=new int[transitionList.size()];
-        for(int k=transitionList.size()-1;k>=0;k--){
-            replacements[k]=generator.next(existing);
+        if(transitionList.size()>0){
+        	for(int k=transitionList.size()-1;k>=0;k--){
+            	replacements[k]=generator.next(existing);
+        	}
+        	collapseAndRefill(replacements);
+        }else{
+        	transitionList=null;
         }
-        collapseAndRefill(replacements);
     	return new ServerResponse(transitionList,replacements,hasLost());
     }
     private TransitionList internalBfsOn(int i, int j){
@@ -80,6 +84,7 @@ public class Grid{
             Transition out=animate.removeLast();
             tList.addTransitionAndExecute(out);
         }
+        dontChange.increment();
     	return tList;
     }
     private boolean hasLost(){
@@ -99,7 +104,7 @@ public class Grid{
     		for(int i=squareSize-1;i>=0;i--){
     			if(cells[i][j].getValue()==CellHolder.EMPTY){
     				int rowNum=i-1;
-    				while(rowNum>=0&&cells[i][j].getValue()==CellHolder.EMPTY){
+    				while(rowNum>=0&&cells[rowNum][j].getValue()==CellHolder.EMPTY){
     					rowNum--;
     				}
     				if(rowNum>=0){

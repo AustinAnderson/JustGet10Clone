@@ -32,6 +32,21 @@ public class TestGrid {
 		final int CanCombineAfter=0;
 		final int CantCombineAfter=1;
 		final int Duplicates=2;
+		int[][] saveByFalling={
+			{3,5,2,1,2},
+			{1,6,5,2,3},
+			{4,2,5,3,2},
+			{1,4,2,4,3},
+			{4,1,5,2,1}
+		};
+		
+		int[][] loseSaveByReplaceTile2={
+			{2,2,5,3,2},
+			{1,5,3,2,3},
+			{4,2,5,3,2},
+			{1,4,2,4,3},
+			{4,1,5,2,1},
+		};
 		int[][] loseSaveByReplaceTile={
 			{2,4,4,3,2},
 			{1,5,3,2,3},
@@ -40,11 +55,17 @@ public class TestGrid {
 			{4,1,5,2,1},
 		};
 		Object[][] paramData=new Object[][]{
+			//row,col,gridData,replaceNum,canCombine after,expected transitions,expected replace list, name
 			{4,3,null,3,true,null,null,"can combine after"},
 			{3,2,null,9,false,null,null,"can't combine after"},
 			{2,0,null,3,true,null,null,"bfs potentially duplicate from"},
 			{0,2,loseSaveByReplaceTile,3,false,null,new int[]{3},"lose by replace tile"},
 			{0,2,loseSaveByReplaceTile,5,true,null,new int[]{5},"saved by replace tile"},
+			{0,2,loseSaveByReplaceTile,4,false,null,new int[]{4},"lose by replace tile replace with target"},
+			{0,1,loseSaveByReplaceTile,1,true,null,new int[]{1},"dont loose by combination increment"},
+			{0,0,loseSaveByReplaceTile2,3,true,null,new int[]{3},"saved by replace tile other side"},
+			{0,0,loseSaveByReplaceTile2,2,false,null,new int[]{2},"saved by replace tile other side replace with target"},
+			{2,2,saveByFalling,4,true,null,new int[]{4},"saved by falling tile"},
 		};
 		paramData[CanCombineAfter][INPUT_GRID]=new int[][]{//combine on 4,3
             {1,2,2,1,1},//1,3,3,3,3
@@ -144,6 +165,7 @@ public class TestGrid {
             }});
         }};
         paramData[Duplicates][EXPECTED_REPLACE_LIST]=new int[]{3,3,3,3};
+        //*/
 		return Arrays.asList(paramData);
 	}
 	

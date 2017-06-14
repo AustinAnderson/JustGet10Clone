@@ -111,12 +111,12 @@ function Tile(number){
         box.setAttribute("width",""+globals.cellSize+"px");
         box.style="stroke: black";
         var text=document.createElementNS('http://www.w3.org/2000/svg',"text");
-        text.setAttribute("dy",""+globals.cellSize*(2/3)+"px");
-        text.setAttribute("dx",""+globals.cellSize*(1/3)+"px");
+        text.setAttribute("y",""+globals.cellSize*(1/2)+"px");
+        text.setAttribute("x",""+globals.cellSize*(1/2)+"px");
         text.setAttribute("font-size",""+globals.cellSize/2+"px");
+        text.setAttribute("text-anchor","middle");
+        text.setAttribute("dominant-baseline","central");
         text.setAttribute("class","cellText");
-        //text.setAttribute("dy","25px");
-        //text.setAttribute("dx","15px");
         numberTextHandle=text;
         inner.appendChild(box); 
         inner.appendChild(text);
@@ -156,8 +156,8 @@ function TileHolder(col,row,number,svg,tileGrid){
     var markedForDeletion=false;
 
     var clickListener=function(){
-        console.log(""+row+","+col+" clicked");
         tileGrid.doAjax(row,col);
+        
     }
 
     this.enableClickListening=function(){
@@ -262,14 +262,22 @@ function TileGrid(rows,cols,svg,numbers){
     		}
     		numberGrid.push(numberRow);
     	}
+console.log("new move");
+console.log("on "+row+", "+col);
+console.log(JSON.stringify(numberGrid).replace(/],/g,"],\n ").replace(/[\[]/g,"{").replace(/]/g,"}"));
         $.ajax({ type:"POST",
         url: "/moveOn/"+row+"/"+col,
         data: JSON.stringify(numberGrid),
         success: function(response){
-        	if(response.transitionList.transitionList.length!=0&&response.replaceList.length!=0){
+        	if(response.transitionList!==null&&response.transitionList.transitionList.length!=0&&response.replaceList.length!=0){
+console.log(JSON.stringify(response.replaceList).replace(/[\[]/g,"{").replace(/]/g,"}"));
+				var num=numberGrid[row][col]+1;
+				if(num>window.bestThisRound){
+					window.bestThisRound=num;
+				}
         		that.resetWith(response.transitionList.transitionList,response.replaceList);
         		that.RunTransitions();
-        		hasLost=response.lostGame;
+        		hasLost=response.hasLost;
         	}
         },
         dataType:"json",
@@ -286,9 +294,15 @@ function TileGrid(rows,cols,svg,numbers){
         pendingCallBackCount--;
         if(pendingCallBackCount<=0){
             if(hasLost){
-                var displayContainer=document.getElementById('messageDisplayContainer');
-                displayContainer.style.opacity=1;
-                displayContainer.style.display='inline';
+                (function(){
+                	var highScoreSpot=document.getElementById('highScoreSquare');
+                	highScoreSquare.appendChild(new Tile(bestThisRound).getDom());
+					var displayContainer=document.getElementById('messageDisplayContainer');
+					displayContainer.style.display='inline';
+					window.setTimeout(function(){
+						displayContainer.style.opacity=1;
+					},50);
+				}());
             }else{
                 for(i=0;i<grid.length;i++){
                     for(j=0;j<grid[i].length;j++){
@@ -340,7 +354,7 @@ function TileGrid(rows,cols,svg,numbers){
                         pendingCallBackCount++;
                         //closure captures a reference to vars outside, so when the function is called, grid[i][j] would be grid[0][0]
                         //so we need to capture grid[i][j] on each iteration in a new variable
-                        //the immediatley executing function expression forces currentTileHolder variable to go out of scope 
+                        //the immediately executing function expression forces currentTileHolder variable to go out of scope 
                         //and be recreated on the next iteration of the loop
                         (function(){
                             var currentTileHolder=grid[i][j];
@@ -387,12 +401,37 @@ function TileGrid(rows,cols,svg,numbers){
 
 
 var main=function(){
+
+/*
+
+#container{
+	width:400px;
+	font-size:100%;
+}
+.display{
+    width:300px;
+    height:300px;
+}
+*/
+    var displayContainer=document.getElementById("container");
     var display=document.getElementById("display");
-    if (/Mobi/.test(navigator.userAgent)) {
-        display.setAttribute("class","mobileDisplay");
+    if (!(/Mobi/.test(navigator.userAgent))) {
+        display.style.width="300px";
+        display.style.height="300px";
+        displayContainer.style.width="400px";
+        displayContainer.style.setProperty("font-size","100%");
     }
 
+    window.bestThisRound=1;
     var tilesPerSide=buildTemplate.length;
+    console.log(buildTemplate);
+    for(i=0;i<buildTemplate.length;i++){
+    	for(j=0;j<buildTemplate[i].length;j++){
+    		if(buildTemplate[i][j]>bestThisRound){
+    			bestThisRound=buildTemplate[i][j];
+    		}
+    	}
+    }
     globals=new Globals(tilesPerSide);
     grid=new TileGrid(tilesPerSide,tilesPerSide,display,buildTemplate);
 
