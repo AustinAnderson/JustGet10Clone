@@ -23,8 +23,8 @@ public class ContentControllers {
 		ModelAndView indexPage=new ModelAndView("index");
 		int[][] data=Grid.newGame(5, new MimicOriginalInitializerRNG());
 		try {
-			indexPage.addObject("gridNum",new ObjectMapper().writeValueAsString(data));
-			indexPage.addObject("gridNums","[[2,3,3,1,2],[1,2,1,2,1],[2,1,2,1,2],[1,2,1,2,1],[2,1,2,1,2]]");
+			indexPage.addObject("gridNums",new ObjectMapper().writeValueAsString(data));
+			//indexPage.addObject("gridNums","[[2,3,3,1,2],[1,2,1,2,1],[2,1,2,1,2],[1,2,1,2,1],[2,1,2,1,2]]");
 		} catch (JsonProcessingException e) {
 			indexPage.addObject("gridNums","[[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1],[1,1,1,1,1]]");
 		}

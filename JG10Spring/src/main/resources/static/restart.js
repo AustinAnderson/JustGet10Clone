@@ -296,10 +296,14 @@ console.log(JSON.stringify(response.replaceList).replace(/[\[]/g,"{").replace(/]
             if(hasLost){
                 (function(){
                 	var highScoreSpot=document.getElementById('highScoreSquare');
+                	highScoreSquare.style.width=globals.cellSize+globals.marginLeft*2;
                 	highScoreSquare.appendChild(new Tile(bestThisRound).getDom());
 					var displayContainer=document.getElementById('messageDisplayContainer');
+					var focusOverlay=document.getElementById('focusOverlay')
+					focusOverlay.style.display='inline';
 					displayContainer.style.display='inline';
 					window.setTimeout(function(){
+						focusOverlay.style.opacity=.75;
 						displayContainer.style.opacity=1;
 					},50);
 				}());

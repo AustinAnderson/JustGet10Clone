@@ -7,9 +7,10 @@
     height:100vw;
 }
 #highScoreSquare{
+	position:relative;
+	left:50%;
+	transform:translateX(-50%);
 	height:100%;
-	width:100%;
-	display:flex;
 	flex-direction: column;
 }
 #messageInnerContainer{
@@ -21,6 +22,14 @@
 	right:0;
 	height:80%;
 	width:80%;
+}
+#focusOverlay{
+	display:none;
+	opacity: 0;
+	background-color:black;
+	width:100%;
+	height:100%;
+	position:absolute;
 }
 
 #messageDisplayContainer{
@@ -34,7 +43,8 @@
 	border-radius:10px;
 	height:50%;
 	width:80%;
-	box-shadow: 10px 10px 5px #222222;
+	box-shadow: 12px 12px 10px #222;
+	box-shadow: 10px 10px 5px #444;
 	/*transition: opacity .75s;*/
 	transition: opacity 3s;
 	opacity: 0;/*1   switch between these two to display window*/
@@ -52,10 +62,8 @@
 	  inset 0 1px 1px rgba(255,255,255,0.8); /*top internal highlight*/
 }
 #highScoreText{
-	display:flex;
-	flex-direction: column;
 	font-size:65%;
-	justify-content:center;	
+	text-shadow: 1px 1px 5px white;
 }
 
 #textDisplay{
@@ -94,13 +102,10 @@
     height:10%;
     background-color:darkgrey;
 }
-.saveButton{
-    width:48%;
-    height:100%;
-}
 .restartButton{
-    width:48%;
+    width:80%;
     height:100%;
+    font-size:200%
 }
 .border{
     fill: black;
@@ -159,10 +164,10 @@ text{
 }
 .n7 .cellText{fill: #FFBDA5;}
 .n8{
-    stroke: orange;
-    fill: red;
+    stroke: #FFD1B3;
+    fill: #E53046;
 }
-.n8 .cellText{fill: orange;}
+.n8 .cellText{fill: #FFD1B3;}
 .n9{
     stroke: #D15B32;
     fill: #FDF536;
