@@ -47,11 +47,45 @@
 				</div>
 			</div>
 			<svg id="display" class="display" th:onload="${'window.buildTemplate='+gridNums+'; main();'}">
-				
-			</svg>
-			<div id="buttonsContainer" >
-				<button id="restart" class="restartButton" onclick="location.reload();">restart</button>
-			</div>
+			  <defs>
+                <linearGradient id="Gradient10">
+                  <stop offset="5%" stop-color="white"/>
+                  <stop offset="95%" stop-color="blue"/>
+                </linearGradient>
+                <pattern id="Pattern10" x="0" y="0" width="1" height="1">
+                  <rect x="0" y="0" height="100" width="100" fill="black"/>
+                  <circle cy="24" cx="3" r="2" fill="#FFF" />
+                  <circle cy="7" cx="23" r="2" fill="#FF5" />
+                  <circle cy="12" cx="5" r="3" fill="#FF9" />
+                  <circle cy="55" cx="55" r="55" fill="url(#Gradient10)" /> 
+                </pattern>
+                <radialGradient id="Gradient11">
+                	<stop offset="1%" stop-color="#FEE"/>
+                	<stop offset="99%" stop-color="red"/>
+                </radialGradient>
+                <pattern id="Pattern11" x="0" y="0" width="1" height="1">
+                	<circle id="Pattern11Circle" fill="url(#Gradient11)" cx="25" cy="25" r="40"/>
+                </pattern>
+                <radialGradient id="Gradient12">
+                	<stop offset="1%" stop-color="#FEE"/>
+                	<stop offset="99%" stop-color="rebeccapurple"/>
+                </radialGradient>
+                <pattern id="Pattern12" x="0" y="0" width="1" height="1">
+                	<circle id="Pattern12Circle" fill="url(#Gradient12)" cx="25" cy="25" r="40"/>
+                </pattern>
+                <radialGradient id="Gradient13">
+                	<stop offset="1%" stop-color="#FEE"/>
+                	<stop offset="99%" stop-color="rebeccapurple"/>
+                </radialGradient>
+                <pattern id="Pattern13" x="0" y="0" width="1" height="1">
+                	<circle id="Pattern13Circle" fill="url(#Gradient13)" cx="25" cy="25" r="40"/>
+                </pattern>
+              </defs>
+                            
+            </svg>
+            <div id="buttonsContainer" >
+                <button id="restart" class="restartButton" onclick="location.reload();">restart</button>
+            </div>
 		</div>
 	</body>
 </html>

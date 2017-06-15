@@ -1,4 +1,3 @@
-
 .display {
     background-color:grey;
     display: inline-block;
@@ -183,3 +182,18 @@ text{
     fill: #FDF536;
 }
 .n9 .cellText{fill: #D15B32;}
+.n10{
+	stroke: #AAA;
+	fill: url('#Pattern10');
+}
+.n10 .cellText{fill: white;}
+.n11{
+	stroke:#EEE;
+	fill: url('#Pattern11');
+}
+.n11 .cellText{fill:white;}
+.n12{
+	stroke:#EEE;
+	fill: url('#Pattern12');
+}
+.n12 .cellText{fill:white;}

@@ -405,18 +405,6 @@ console.log(JSON.stringify(response.replaceList).replace(/[\[]/g,"{").replace(/]
 
 
 var main=function(){
-
-/*
-
-#container{
-	width:400px;
-	font-size:100%;
-}
-.display{
-    width:300px;
-    height:300px;
-}
-*/
     var displayContainer=document.getElementById("container");
     var display=document.getElementById("display");
     if (!(/Mobi/.test(navigator.userAgent))) {
@@ -425,9 +413,36 @@ var main=function(){
         displayContainer.style.width="400px";
         displayContainer.style.setProperty("font-size","100%");
     }
+    var tilesPerSide=buildTemplate.length;
+    globals=new Globals(tilesPerSide);
+                              //{ cy      cx      r}* globals.cellSize
+	var circleSizesPattern10=[[0.45000,0.05625,0.03750],
+		      	 	 	 	  [0.13125,0.39375,0.03750],
+		      	 	 	 	  [0.22500,0.09375,0.05625],
+		      	 	 	 	  [0.93750,1.03125,1.03125]];
+	var pattern10Circles=document.getElementById("Pattern10").children;
+	//background fill rect
+	pattern10Circles[0].setAttribute("height",globals.cellSize);
+	pattern10Circles[0].setAttribute("width",globals.cellSize);
+	for(i=1;(i-1)<circleSizesPattern10.length&&i<pattern10Circles.length;i++){
+		pattern10Circles[i].setAttribute("cy",""+(circleSizesPattern10[i-1][0]*globals.cellSize));
+		pattern10Circles[i].setAttribute("cx",""+(circleSizesPattern10[i-1][1]*globals.cellSize));
+		pattern10Circles[i].setAttribute("r",""+(circleSizesPattern10[i-1][2]*globals.cellSize));
+	}
+	
+	
+	var circlePattern12=document.getElementById("Pattern12Circle");
+	circlePattern12.setAttribute("cx",globals.cellSize/2);
+	circlePattern12.setAttribute("cy",globals.cellSize/2);
+	circlePattern12.setAttribute("r",globals.cellSize);
+	
+	var circlePattern11=document.getElementById("Pattern11Circle");
+	circlePattern11.setAttribute("cx",globals.cellSize/2);
+	circlePattern11.setAttribute("cy",globals.cellSize/2);
+	circlePattern11.setAttribute("r",globals.cellSize);
+	
 
     window.bestThisRound=1;
-    var tilesPerSide=buildTemplate.length;
     console.log(buildTemplate);
     for(i=0;i<buildTemplate.length;i++){
     	for(j=0;j<buildTemplate[i].length;j++){
@@ -436,7 +451,6 @@ var main=function(){
     		}
     	}
     }
-    globals=new Globals(tilesPerSide);
     grid=new TileGrid(tilesPerSide,tilesPerSide,display,buildTemplate);
 
 }
