@@ -1,6 +1,6 @@
 function Globals(sideTileCount){
 
-    this.cellSize=document.getElementById("display").getBoundingClientRect().height/(sideTileCount*1.125);
+    this.cellSize=document.getElementById("display").getBoundingClientRect().width/(sideTileCount*1.125);
     this.borderWidth=this.cellSize/20;
     this.marginTop=this.borderWidth*2;
     this.marginLeft=this.borderWidth*2;
